@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyongjiCampBuild",
-    "slug": "MyongjiCampBuild",
+    "name": "MyongjiCamp",
+    "slug": "MyongjiCamp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,16 +12,23 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "bundleIdentifier":"com.wonpage.MyongjiCamp",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.wonpage.MyongjiCamp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "16fe94b5-8ab1-4590-8cec-f5c682704518"
+      }
     }
   }
 }

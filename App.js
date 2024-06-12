@@ -1,20 +1,24 @@
+import NetInfo from '@react-native-community/netinfo';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import NetworkErrorModal from './modal/NetworkErrorModal';
+import MainNavigation from './navigation/Navigation';
 export default function App() {
+  /** 네트워크 처리 로직 */
+  const [isConnected, setIsConnected] = useState(true);
+  useEffect(()=>{
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    })
+    return () => unsubscribe();
+  },[])
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <>
       <StatusBar style="auto" />
-    </View>
+      <MainNavigation/> 
+      <NetworkErrorModal visible={!isConnected}/>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
