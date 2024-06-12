@@ -46,16 +46,16 @@ const MyPage = ({navigation, route}) => {
     const handleNicknameChange = async() => {
         try{
             const isUpdated = await updateNickname(newNickname);
-            if (isUpdated) {
-                getProfile().then(res => {
+            if (isUpdated){
+                await getProfile().then(res => {
                     if (!res) return;
-                    const newUserData = {...res}
-                    newUserData.nickname = newNickname;
-                    setUserData(newUserData);
-                })
+                    setUserData(res);
+                });
+                setNicknameModalVisible(false);
+                setNewNickname("");
+            } else {
+                Alert.alert('닉네임 변경에 실패했습니다.');
             }
-            setNicknameModalVisible(false);
-            setNewNickname("");
         }catch (err){
             console.log(err)
         }
