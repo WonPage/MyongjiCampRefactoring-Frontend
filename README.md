@@ -1,1 +1,2 @@
-# 명지캠프 리팩토링 (240612 ~ 진행 중)
+## 안드로이드 aab 빌드
+npx expo build --platform android

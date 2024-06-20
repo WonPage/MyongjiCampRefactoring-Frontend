@@ -26,7 +26,7 @@ const MyPage = ({navigation, route}) => {
         {page:'Event', title:'이벤트'},
         {page:'Information', title:'이용안내'},
         {page:'NotifySetting', title:'알림설정'},
-        {page:'PwChange', title: '비밀번호 변경'},
+        {page:'PasswordChange', title: '비밀번호 변경'},
         {page:'Logout', title:'로그아웃'}
     ]
     const iconPath = {
@@ -84,27 +84,23 @@ const MyPage = ({navigation, route}) => {
                         <Image style={{borderRadius: 50, width:100, height:100}} source={iconPath[userData?.profileIcon?userData.profileIcon:undefined]}/>
                     </View>
                 </View>
-                <View>
+                <View style={{marginLeft:wp('3%')}}>
                     <TouchableOpacity onPress={()=>setNicknameModalVisible(true)} style={{marginBottom:hp('0.5%'), flexDirection:'row', alignItems:"center"}}>
-                        <Text style={{fontSize: 30}}>{userData?.nickname}</Text>
-                        <Octicons style={{marginLeft:5}} name="pencil" size={18} color="black" />
+                        <Text style={{fontSize: 30, color:'#251749', fontWeight:'500'}}>{userData?.nickname}</Text>
+                        <Octicons style={{marginLeft:wp('2%'), marginTop:hp('1%')}} name="pencil" size={18} color="black" />
                     </TouchableOpacity>
-                    <Text style={{fontSize: 15}}>{userData?.email}</Text>
+                    <Text style={{fontSize: 15, color:'#251749'}}>{userData?.email}</Text>
                 </View>
             </View>
             <View style={styles.resume_container}>
-                <View style={{flex: 1}}></View>
-                <View style={{flex: 5}}>
                 <TouchableOpacity style={styles.resume_button} onPress={()=>{navigation.navigate('Resume')}}>
-                    <Text style={{fontSize: 20}}>이력서 관리</Text>
+                    <Text style={{fontSize: 20, color:'white'}}>이력서 관리</Text>
                 </TouchableOpacity>
-                </View>
-                <View style={{flex: 1}}></View>
             </View>
             <View style={styles.pages_container}>
                 <FlatList
-                style={{marginTop: 22}}
-                contentContainerStyle= {{paddingVertical: 10, paddingHorizontal:34, alignItems: 'flex-start', paddingBottom:-7}}
+                style={{marginTop: hp('3%'), backgroundColor:'#495579'}}
+                contentContainerStyle= {{paddingVertical: hp('3.2%'), paddingHorizontal:wp('10%')}}
                 data={page_list}
                 renderItem={({item}) => <Item title={item.title} page={item.page} navigation={navigation}/>}
                 />
@@ -151,27 +147,36 @@ const Item = ({title, page, navigation}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor:'#FFFBEB'
     },
     profile_container:{
-        flex: 2.5,
+        height:hp('25%'),
         flexDirection: 'row',
         alignItems: 'center',
         marginHorizontal:'8%'
     },
     resume_container:{
-        flex: 0.8,
+        height: hp('10%'),
         flexDirection: 'row',
+        justifyContent:'center'
     },
     resume_button:{
-        width:'100%', height:'100%', borderRadius: 10,
-        backgroundColor: 'skyblue',
+        width:wp('50%'),
+        height:hp('9%'),
+        borderRadius: 10,
+        backgroundColor: '#263159',
         justifyContent: 'center', alignItems:'center',
     },
     pages_container:{
-        flex: 4,
+        height:hp('50%'),
     },
-    page_item :{ marginBottom: 27,},
-    page_title: {fontSize: 23}
+    page_item :{
+        marginBottom: 27,
+    },
+    page_title: {
+        fontSize: 23,
+        color:'#FFFBEB'
+    }
 });
 
 export default MyPage;

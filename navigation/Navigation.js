@@ -13,6 +13,15 @@ import { AntDesign, Feather, FontAwesome5, Ionicons, Octicons } from "@expo/vect
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Notification from "../screen/(main)/Notification";
 import Resume from "../screen/(main)/Resume";
+import Event from "../screen/(other)/Event";
+import PasswordChange from "../screen/(other)/PasswordChange";
+import NotifySetting from "../screen/(other)/NotifySetting";
+import Notice from "../screen/(other)/Notice";
+import Information from "../screen/(other)/Information";
+import FAQ from "../screen/(other)/FAQ";
+import ResumeDetailModal from "../modal/ResumeDetailModal";
+import ResumeUpdateModal from "../modal/ResumeUpdateModal";
+import ResumeAddModal from "../modal/ResumeAddModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -39,6 +48,21 @@ const Navigation = () => {
                 options={{headerTitle:'글 작성',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
                 <Stack.Screen name="Resume" component={Resume}
                 options={{title: '이력서', headerTitleAlign: 'center', headerTitleStyle:{fontSize: 28}}}  />
+
+                {/* Other Page */}
+                <Stack.Screen name="Event" component={Event}/>
+                <Stack.Screen name="FAQ" component={FAQ}/>
+                <Stack.Screen name="Information" component={Information}/>
+                <Stack.Screen name="Notice" component={Notice}/>
+                <Stack.Screen name="NotifySetting" component={NotifySetting}/>
+                <Stack.Screen name="PasswordChange" component={PasswordChange}/>
+
+                {/* Modal Page */}
+                <Stack.Group screenOptions={{presentation:'transparentModal', headerShown:false}}>
+                    <Stack.Screen name="ResumeDetailModal" component={ResumeDetailModal} />
+                    <Stack.Screen name="ResumeUpdateModal" component={ResumeUpdateModal} />
+                    <Stack.Screen name="ResumeAddModal" component={ResumeAddModal} />
+                </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
     )
@@ -56,17 +80,17 @@ const MainNavigation = ({navigation}) => {
             tabBarStyle:{ height: hp('8.5%'), paddingTop:hp('0.5%'), paddingBottom:hp('1%')},
         }}>
             <Tab.Screen name="Home" component={HomeNavigation}
-            options={{ title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
-            headerTitle: '명지캠프', headerStyle:{backgroundColor:'#ffffff'}}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
+            headerTitle: '명지캠프'}}/>
             <Tab.Screen name="Scrap" component={Scrap}
-            options={{ title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
             <Tab.Screen name="PostButton" component={PostButton}
             options={{ title: '글쓰기', tabBarIcon: ({color, size}) => <AntDesign name="pluscircle" size={34} color={'#003366'} />,
             tabBarButton: (props) => (<TouchableOpacity activeOpacity={0.7} {...props} onPress={()=>{navigation.push('Post');}}/>), tabBarLabelStyle: {display: 'none'}}}/>
             <Tab.Screen name="Apply" component={Apply}
-            options={{ title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
             <Tab.Screen name="MyPage" component={MyPage}
-            options={{ title: '마이페이지', tabBarIcon: ({color, size}) => <Octicons name="person" size={24} color={color} />}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '마이페이지', tabBarIcon: ({color, size}) => <Octicons name="person" size={24} color={color} />}}/>
         </Tab.Navigator>
     )
 }
