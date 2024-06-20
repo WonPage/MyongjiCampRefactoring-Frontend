@@ -22,8 +22,12 @@ import FAQ from "../screen/(other)/FAQ";
 import ResumeDetailModal from "../modal/ResumeDetailModal";
 import ResumeUpdateModal from "../modal/ResumeUpdateModal";
 import ResumeAddModal from "../modal/ResumeAddModal";
+import OnGoing from "../screen/(main)/Home";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Home from "../screen/(main)/Home";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 const Navigation = () => {
     return (
@@ -98,7 +102,11 @@ const MainNavigation = ({navigation}) => {
 
 const HomeNavigation = () => {
     return (
-        <></>
+        <TopTab.Navigator>
+            <TopTab.Screen name="모집 중" component={Home}/>
+            {/* <TopTab.Screen name="모집 완료" component={OnGoing}/> */}
+            {/* <TopTab.Screen name="개발 완료" component={OnGoing}/> */}
+        </TopTab.Navigator>
     )
 }
 
