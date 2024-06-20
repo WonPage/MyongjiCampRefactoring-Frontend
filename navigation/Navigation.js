@@ -55,7 +55,8 @@ const Navigation = () => {
                 <Stack.Screen name="Information" component={Information}/>
                 <Stack.Screen name="Notice" component={Notice}/>
                 <Stack.Screen name="NotifySetting" component={NotifySetting}/>
-                <Stack.Screen name="PasswordChange" component={PasswordChange}/>
+                <Stack.Screen name="PasswordChange" component={PasswordChange}
+                options={{title:'비밀번호 변경'}}/>
 
                 {/* Modal Page */}
                 <Stack.Group screenOptions={{presentation:'transparentModal', headerShown:false}}>

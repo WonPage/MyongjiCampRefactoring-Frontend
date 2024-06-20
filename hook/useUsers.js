@@ -179,8 +179,86 @@ const useUsers = () => {
             }
         }
     }
+    /** 비밀번호 확인 */
+    const verifyPassword = async(password) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const isChecked = axios.post(`${API_URL}/api/auth/password/verify`, {password:password}, {
+            headers:{"Content-Type":'application/json', Authorization: `Bearer ${token.token}`}
+        })
+        .then(res => {
+            const result = res.data;
+            if (result.status === 200){
+                Alert.alert('안내', result.data);
+                return true;
+            }
+            else {
+                Alert.alert('안내', result.data);
+                return false;
+            }
+        })
+        return isChecked;
+    }
+    /** 비밀번호 변경 */
+    const updatePassword = async(password, passwordCheck) => {
+        const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
+        if (password.length === 0){
+            Alert.alert('경고', '비밀번호를 입력해주세요.');
+            return true;
+        } else if (!passwordRegExp.test(password)){
+            Alert.alert('경고', '안전하지 않은 비밀번호입니다.\n\n영문, 숫자, 특수문자 포함 8글자 이상의 비밀번호를 설정해주세요.');
+            return true;
+        } else if (passwordCheck.length === 0) {
+            Alert.alert('경고', '비밀번호 재입력을 입력해주세요.');
+            return true;
+        } else if (password !== passwordCheck){
+            Alert.alert('경고', '동일한 비밀번호를 입력해주세요.');
+            return true;
+        }
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const isFailed = axios.put(`${API_URL}/api/auth/password/update`, {password:password}, {
+            headers:{"Content-Type":'application/json', Authorization: `Bearer ${token.token}`}
+        }).then(response=>{
+            if (response.status===200) {
+                Alert.alert('안내', '비밀번호가 변경되었습니다.');
+                return false;
+            } else {
+                Alert.alert('안내', response.data.data);
+                return true;
+            }
+        })
+        return isFailed;
+    }
+    /** 비밀번호 찾기 */
+    const findPassword = async(email) => {
+        const regex = /^[a-zA-Z0-9]+$/
+        if (email === ''){
+            Alert.alert('안내', '이메일을 입력해주세요.');
+            return true;
+        }
+        if (!regex.test(email)){ // 한글, 특수문자 방지
+            Alert.alert('안내', '영문, 숫자만 입력 가능합니다.');
+            return true;
+        }
+        const isFailed = axios.post(`${API_URL}/api/email/password`,{email:`${email}@mju.ac.kr`},{
+            headers:{'Content-Type':'application/json'}
+        })
+        .then(res => {
+            if (res.status === 200){
+                Alert.alert('안내', '이메일로 임시 비밀번호를 전송했습니다.');
+                return false;
+            } else {
+                Alert.alert('안내', '비밀번호 찾기를 실패했습니다.');
+                return true;
+            }
+        })
+        .catch(err => {
+            Alert.alert('안내', '비밀번호 찾기를 실패했습니다.');
+            return true;
+        })
+        return isFailed;
+    }
 
-    return {tryLogin, logout, sessionCheck, getProfile, updateIcon, updateNickname};
+    return {tryLogin, logout, sessionCheck, getProfile, updateIcon, updateNickname, verifyPassword, updatePassword, findPassword};
 }
 
 export default useUsers;
