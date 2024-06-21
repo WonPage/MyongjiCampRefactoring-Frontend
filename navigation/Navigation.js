@@ -6,7 +6,7 @@ import Signup from "../screen/(auth)/Signup";
 import PasswordFind from "../screen/(auth)/PasswordFind";
 import MyPage from "../screen/(main)/MyPage";
 import Apply from "../screen/(main)/Apply";
-import { Platform, TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
 import Scrap from "../screen/(main)/Scrap";
 import Post, { PostButton } from "../screen/(main)/Post";
 import { AntDesign, Feather, FontAwesome5, Ionicons, Octicons } from "@expo/vector-icons";
@@ -22,9 +22,12 @@ import FAQ from "../screen/(other)/FAQ";
 import ResumeDetailModal from "../modal/ResumeDetailModal";
 import ResumeUpdateModal from "../modal/ResumeUpdateModal";
 import ResumeAddModal from "../modal/ResumeAddModal";
-import OnGoing from "../screen/(main)/Home";
+import OnGoing, { Complete } from "../screen/(main)/Home";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Home from "../screen/(main)/Home";
+import Search from "../screen/(main)/HomeSearch";
+import HomeSearch from "../screen/(main)/HomeSearch";
+import Finish from "../screen/(main)/Home_Finish";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -99,14 +102,22 @@ const MainNavigation = ({navigation}) => {
     )
 }
 
+
+
+
 const HomeNavigation = () => {
     return (
         <TopTab.Navigator>
-            <TopTab.Screen name="모집 중" component={Home}/>
-            {/* <TopTab.Screen name="모집 완료" component={OnGoing}/> */}
-            {/* <TopTab.Screen name="개발 완료" component={OnGoing}/> */}
-        </TopTab.Navigator>
+        <TopTab.Screen name="OnGoing" component={OnGoing} 
+        options={{title:'모집 중'}}/>
+        <TopTab.Screen name="Complete" component={Complete}
+        options={{title:'모집 완료'}}/>
+        
+        <TopTab.Screen name="Finish" component={Finish}
+        options={{title:'개발 완료'}}/>
+       </TopTab.Navigator>
     )
 }
+
 
 export default Navigation;
