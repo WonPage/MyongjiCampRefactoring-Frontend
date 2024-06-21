@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     input_email_txt: {
+        
         fontSize: 15,
     },
     input_email_rear: {

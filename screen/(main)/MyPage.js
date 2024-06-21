@@ -44,21 +44,20 @@ const MyPage = ({navigation, route}) => {
         {id: 5, name: 'rabbit', image: require('../../assets/profile-icon/rabbit.jpg')},
     ]
     const handleNicknameChange = async() => {
-        try{
-            const isUpdated = await updateNickname(newNickname);
+        updateNickname(newNickname).then(isUpdated=>{
             if (isUpdated){
-                await getProfile().then(res => {
+                getProfile().then(res => {
                     if (!res) return;
-                    setUserData(res);
+                    const newUserData = {...res};
+                    newUserData.nickname = newNickname;
+                    setUserData(newUserData);
                 });
                 setNicknameModalVisible(false);
                 setNewNickname("");
             } else {
                 Alert.alert('닉네임 변경에 실패했습니다.');
             }
-        }catch (err){
-            console.log(err)
-        }
+        })
     }
     return(
         <View style={styles.container}>
