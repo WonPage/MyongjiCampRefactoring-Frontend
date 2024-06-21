@@ -2,7 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { CardStyleInterpolators, createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Login from "../screen/(auth)/Login";
-import Signup from "../screen/(auth)/Signup";
+import Signup, { SignupNickname, SignupPassword } from "../screen/(auth)/Signup";
 import PasswordFind from "../screen/(auth)/PasswordFind";
 import MyPage from "../screen/(main)/MyPage";
 import Apply from "../screen/(main)/Apply";
@@ -38,6 +38,10 @@ const Navigation = () => {
                 options={{headerShown: false, cardStyle:{backgroundColor:'white'}}} />    
                 <Stack.Screen name="Signup" component={Signup} 
                 options={{cardStyle:{backgroundColor:'white'}, title: '회원가입', headerTitleAlign: 'center', headerShadowVisible: false}} />
+                <Stack.Screen name="SignupPassword" component={SignupPassword} 
+                options={{cardStyle:{backgroundColor:'white'}, title: '회원가입', headerTitleAlign: 'center', headerShadowVisible: false, cardStyleInterpolator: (CardStyleInterpolators.forNoAnimation)}} />
+                <Stack.Screen name="SignupNickname" component={SignupNickname} 
+                options={{cardStyle:{backgroundColor:'white'}, title: '회원가입', headerTitleAlign: 'center', headerShadowVisible: false, cardStyleInterpolator: (CardStyleInterpolators.forNoAnimation)}} />
                 <Stack.Screen name="PasswordFind" component={PasswordFind}
                 options={{cardStyle:{backgroundColor:'white'}, title:'비밀번호 찾기', headerTitleAlign:'center'}}/>
 
