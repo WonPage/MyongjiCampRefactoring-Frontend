@@ -30,8 +30,8 @@ const useUsers = () => {
                 refreshExp: refreshExp.toISOString()
             }
             AsyncStorage.setItem('token', JSON.stringify(loginData));
-            navigation.replace('MainNavigation');
-            return Alert.alert('안내', result.data.message);
+            return navigation.replace('MainNavigation');
+            // return Alert.alert('안내', result.data.message);
         }).catch(err=>{
             // 로그인 실패 중, 서버에서 메세지를 가져왔다면 해당 메세지를, 안가져왔다면 네트워크 오류 메세지
             if (!err.response){

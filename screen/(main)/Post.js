@@ -5,13 +5,13 @@ import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 
 import { Picker } from "@react-native-picker/picker";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import { FontAwesome6 } from "@expo/vector-icons";
+import useBoard from "../../hook/useBoard";
 
 const Post = ({navigation, route}) => {
     const {sessionCheck} = useUsers();
     useFocusEffect(()=>{
         sessionCheck(route);
     })
-    const [viewHeight, setViewHeight] = useState(130);
     const [postTitle, setPostTitle] = useState('');
     const [postContent, setPostContent] = useState('');
     const [postLocation, setPostLocation] = useState('');
@@ -19,21 +19,29 @@ const Post = ({navigation, route}) => {
     const [durationUnit, setDurationUnit] = useState('일'); 
     const [roleData, setRoleData] = useState([{role:'FRONT', appliedNumber:'', requiredNumber:''}]);
     const handleRoleAdd = () => {
+        setRoleData([...roleData, {role:'FRONT', appliedNumber:"", requiredNumber:""}]);
     }
-    const postWrite = async() => {
+    const {postBoard} = useBoard();
+    const postWrite = () => {
+        const postData = {
+            title : postTitle,
+            content : postContent,
+            preferredLocation: postLocation,
+            expectedDuration: `${postDuration}${durationUnit}`,
+            roleAssignments: roleData
+        }
+        postBoard(postData).then(data=>{
+            if (!data.isFailed) navigation.pop();
+        })
     }
     return (
         <ScrollView>
-            <View style={[styles.container, { height: hp(`${viewHeight}%`) }]}>
+            <View style={{backgroundColor:'white', padding: 20}}>
                 <View style={{ justifyContent:'center', height: hp('10%'), marginBottom: hp('3%') }}>
                     <Text style={{ marginLeft: 3, marginBottom: 3 }}>제목 (최대 20자)</Text>
-                    <TextInput
-                        placeholder="제목"
-                        maxLength={20}
-                        style={styles.title_input} value={postTitle}
-                        onChangeText={setPostTitle} />
+                    <TextInput onChangeText={setPostTitle} style={{borderBottomWidth: 1, color: 'black', fontSize: 32,}} placeholder="제목" maxLength={20} value={postTitle}/>
                 </View>
-                <View style={[styles.content_container, { height: hp('42%'), marginBottom: hp('3%') }]}>
+                <View style={{ height: hp('42%'), marginBottom: hp('3%') }}>
                     <Text style={{ marginLeft: 3, marginBottom: 3 }}>내용</Text>
                     <TextInput
                         maxLength={500}
@@ -42,18 +50,18 @@ const Post = ({navigation, route}) => {
                         style={styles.content_input_box} value={postContent}
                         onChangeText={setPostContent} />
                 </View>
-                <View style={[styles.role_container, { height: hp(`${viewHeight - 102}%`), marginBottom: hp('3%') }]}>
+                <View style={[styles.role_container, { marginBottom: hp('3%') }]}>
                     <Text style={{ marginLeft: 3, marginBottom: 3 }}>필요 직무</Text>
                     <View style={styles.role_list_container}>
                         <View style={[styles.role_list_description, { marginTop: hp('1%') }]}>
                             <Text style={{ fontSize: 12 }}>현재인원 / 필요인원</Text>
                         </View>
                         <View style={styles.role_item_container}>
-                            <RoleItem roleData={roleData} setRoleData={setRoleData} setViewHeight={setViewHeight} />
+                            <RoleItem roleData={roleData} setRoleData={setRoleData}/>
                         </View>
                         <TouchableOpacity
                             style={[styles.role_add_button, { height: hp('6%'), marginTop: hp('2%'), display: (roleData.length >= 7 ? 'none' : undefined) }]} onPress={handleRoleAdd}>
-                            <Text>추가</Text>
+                            <Text style={{color:'white', fontSize:15}}>추가</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -87,7 +95,7 @@ const Post = ({navigation, route}) => {
                 <View style={[styles.post_button_container, { height: hp('10%') }]}>
                     <TouchableOpacity onPress={postWrite}
                         style={styles.post_button}>
-                        <Text>작성</Text>
+                        <Text style={{color:'white'}}>작성</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -95,7 +103,7 @@ const Post = ({navigation, route}) => {
     )
 }
 
-function RoleItem({roleData, setRoleData, setViewHeight}){
+function RoleItem({roleData, setRoleData}){
     const inputRefs = useRef([]);
     const inputRefs2 = useRef([]);
     const handleNumberChange = (type, index, value) => {
@@ -125,7 +133,6 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
         const updatedRoleData = [...roleData];
         updatedRoleData.splice(index, 1);
         setRoleData(updatedRoleData);
-        setViewHeight(prev=>prev-8);
       };
     return (
         <>
@@ -219,22 +226,8 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor:'white',
-        padding: 20
-    },
-    title_container: {
-       
-    },
-    title_input:{
-        borderBottomWidth: 1, color: 'black', fontSize: 32,
-    },
-    content_container: {
-    },
-    role_container: {
-    },
         role_list_container:{
-            flex:1, borderWidth: 1, borderRadius:10, alignItems: 'center', padding: 10
+            borderWidth: 1, borderRadius:10, alignItems: 'center', padding: 10
         },
         role_list_description: {
             alignSelf:'stretch', flexDirection: 'row', justifyContent:'flex-end', marginBottom: 5, marginRight: 5
@@ -260,7 +253,6 @@ const styles = StyleSheet.create({
             justifyContent:'center',
             flex: 2,
             flexDirection: 'row',
-            backgroundColor: 'yellow',
             borderWidth: 1,
             borderRadius: 30,
         },
@@ -273,10 +265,10 @@ const styles = StyleSheet.create({
             flex: 1,
         },
         role_add_button:{
-            backgroundColor: 'yellow',
-            borderRadius: 40,
+            backgroundColor: '#495579',
+            borderRadius: wp('5%'),
             justifyContent: 'center', alignItems:'center',
-            width: '50%',
+            width: wp('30%'),
         },
     location_container: {
         justifyContent:'center',
@@ -304,7 +296,7 @@ const styles = StyleSheet.create({
         flex: 1.2
     },
     post_button_container: { alignItems: 'center', justifyContent:'center'},
-    post_button: {borderRadius: 20, backgroundColor: 'skyblue', width: '50%', height:'60%', alignItems: 'center', justifyContent: 'center' }
+    post_button: {borderRadius: wp('5%'), backgroundColor: '#263159', width: wp('50%'), height:hp('7%'), alignItems: 'center', justifyContent: 'center' }
 });
 
 export const PostButton = () => {

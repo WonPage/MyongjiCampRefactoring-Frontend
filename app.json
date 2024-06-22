@@ -12,7 +12,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "bundleIdentifier":"com.wonpage.MyongjiCamp",
+      "bundleIdentifier": "com.wonpage.MyongjiCamp",
       "supportsTablet": true
     },
     "android": {
@@ -29,6 +29,14 @@
       "eas": {
         "projectId": "16fe94b5-8ab1-4590-8cec-f5c682704518"
       }
-    }
+    },
+    "plugins": [[
+      "expo-build-properties",
+      {
+        "android": {
+          "usesCleartextTraffic": true
+        }
+      }
+    ]]
   }
 }
