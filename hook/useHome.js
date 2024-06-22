@@ -14,7 +14,6 @@ export default function useHome(){
         params.append('status',recruits[3]);
         const result = axios.get(`${API_URL}/api/board?${params.toString()}`)
         .then(res=>{
-         //   console.log('res.data.data : ', res.data.data);
             return res.data.data; //axios로 값을 얻어오기 위함
         })
         .catch(error=>{

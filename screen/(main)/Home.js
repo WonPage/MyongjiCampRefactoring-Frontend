@@ -7,7 +7,7 @@ import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
- export default function OnGoing(){
+export default function OnGoing(){
     return Home([0,'DESC','recruit','ongoing'])
 } 
 export function Complete(){
@@ -17,7 +17,7 @@ export function Complete(){
 
 function Home(recruitForm){
     const navigation = useNavigation();
-    const [recruitList, setRecruitList] = useState(null);
+    const [recruitList, setRecruitList] = useState([]);
     // null일 때 로딩창 0개일 때 게시글 없다 1개 이상일 때 게시글
     const[page, setPage] = useState(0);
     const[buttonVisible, setButtonVisible] = useState(true)
@@ -26,72 +26,43 @@ function Home(recruitForm){
         recruitForm[0] = page
         getRecruitList(recruitForm).then(recruits=>{
             let tmp = null;
-            console.log('recruitForm',recruitForm)
-
+            console.log('page', page)
             if(page === 0){
                 tmp = recruits;
                 // setRecruitList(recruits);
             }
             else{
-                 if(recruits.length > 1){
-                  tmp = [...recruitList];
-                //  tmp.push(recruits); 
-                }
-                else{
-                    setButtonVisible(false)
-                } 
+            tmp = [...recruitList];
+            tmp = tmp.concat(recruits);
             }
-            console.log('tmp',tmp)
-
+           //  console.log('tmp',tmp)
             setRecruitList(tmp)
         })
     },[page]) 
 
+
     const handleMoreButton = () => {
-        setPage(page+1);
-     //   console.log('recruitForm',recruitForm)
-    }
+        let next = recruitForm
+        next[0] = page+1
+        getRecruitList(next).then(recruits=>{
+            if(recruits.length > 1){
+                setPage(page+1);
+            console.log('hihihihihihi')
 
-
-
- 
-    // 다른 페이지에 갔다가 돌아오면 page가 0으로 되게 -> unmountblur?
-    // 이 부분 잘 되었는지 게시글 추가 시키고 확인
-/*     const handleRecruitMoreButton = () => {
-     //   setRecruitForm([page,'DESC','recruit','ongoing'])
-     //   setPage(page+1)
-     //   console.log('button',recruitForm)
-        let tmp = [...recruitList];
-     //       setRecruitForm([page,'DESC','recruit','ongoing'])
-         let UpdatedRecruitForm = recruitForm
-        console.log('old ',UpdatedRecruitForm)
-        UpdatedRecruitForm[0] = page+1; 
-        // console.log('new ', UpdatedRecruitForm)
-        recruitForm[0] = page+1
-        getRecruitList(UpdatedRecruitForm).then(recruits=>{
-            if(recruits.length < 1){
-             //   console.log('마지막 페이지')
-                console.log('recruit.length',recruits.length)
             }
             else{
-                setPage(page+1)
+               console.log('bibibibbi')
 
-                tmp.push(recruits);
-
-                console.log('more recruit',recruits)
-            }
+                setButtonVisible(false)
+            } 
         })
-        console.log('page',page)
-        console.log('tmp',tmp)
-
-        setRecruitList(tmp)
-
-    } */
+    }
 
     return(
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicato={false}>
                 {recruitList ? recruitList.map((item, index)=>{
+                 //   console.log('item',item)
                     const date = new Date(item?.modifiedDate);
                     const year = date.getFullYear();
                     const month = date.getMonth() + 1;
@@ -114,7 +85,7 @@ function Home(recruitForm){
                                     else if (role === 'DESIGN') roleName = '디자인';
                                     else if (role === 'FULL') roleName = '풀스택';
                                     else if (role === 'PM') roleName = '기획';
-                                    else roleName = role;
+                                    else roleName = role.toString();
                                     return (
                                     <View key={index} style={[{borderRadius:15, paddingVertical:2, paddingHorizontal:4,marginRight:hp('0.5%')},
                                     role=='BACK'? {backgroundColor:'#8FCACA'}: role=='FRONT' ? {backgroundColor:'#FFAEA5'} :
@@ -141,7 +112,7 @@ function Home(recruitForm){
                 </TouchableOpacity>
                     )
 
-                }):(<Loading/>)}
+                }):(<Loading/>)} 
                 {buttonVisible?
                 <View
                    style={{justifyContent:'center', alignItems:'center', height:hp('8%'), marginBottom:hp('1%')}}>
