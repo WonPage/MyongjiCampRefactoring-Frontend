@@ -1,11 +1,10 @@
 /** 담당자 채윤 
- * 240618 - 네트워크 문제 페이지 */
+ * 240618 - 지원서 훅 설계 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function useApply(){
-    // 지원현황
     async function getAppliedResume(){
             const token = JSON.parse(await AsyncStorage.getItem('token'));
             const result = axios.get(`${API_URL}/api/auth/apply/applicant`,{

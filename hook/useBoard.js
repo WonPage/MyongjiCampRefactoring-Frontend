@@ -1,11 +1,12 @@
+/** 담당자 채윤 
+ * 240622 - 게시판 작성하기, 상세보기 조회 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import axios from "axios"
 import { Alert } from "react-native";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function useBoard(){
-    const navigation = useNavigation();
+    /** 게시글 작성하기 */
     const postBoard = async(postData) => {
         const {title, content, preferredLocation, expectedDuration, roleAssignments} = postData;
         if (title.length < 1 || content.length < 1 || preferredLocation.length < 1 || expectedDuration.length < 1) {
@@ -63,5 +64,64 @@ export default function useBoard(){
         })
         return data;
     }
-    return {postBoard}
+    /** 게시글 상세보기 */
+    const getBoardDetail = async(boardId) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.get(`${API_URL}/api/auth/recruit/${boardId}`, {
+            headers: {Authorization: `Bearer ${token.token}` }
+        })
+        .then(res => {
+            if (res.status===200){
+                return {isFailed: false, userId: token.userId, postData: res.data.data}
+            } else {
+                return {isFailed: true}
+            }
+        })
+        .catch(err => {
+            console.log('게시글 상세보기 오류 :',err.response.data);
+            Alert.alert('안내', '게시글 불러오기에 실패하였습니다.');
+            return {isFailed: true};
+        })
+        return data;
+    }
+    /** 게시글 스크랩 여부 확인하기 */
+    const checkScrap = async(boardId) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.get(`${API_URL}/api/auth/scrap/${boardId}`, {
+            headers: {Authorization: `Bearer ${token.token}`}
+        })
+        .then(res => {
+            if (res.status===200){
+                return {isFailed:false, isScrap:res.data.data}
+            } else {
+                return {isFailed:true}
+            }
+        })
+        .catch(err=>{
+            return {isFailed:true}
+        })
+        return data;
+    }
+    /** 게시글 삭제하기  */
+    const deleteBoard = async(boardId) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.delete(`${API_URL}/api/auth/recruit/${boardId}`, {
+            headers: {Authorization: `Bearer ${token.token}` }
+        })
+        .then(res => {
+            if (res.data.status === 200){
+                Alert.alert('안내', res.data.data);
+                return {isFailed:false};
+            } else {
+                Alert.alert('안내', res.data.data);
+                return {isFailed:true};
+            }
+        })
+        .catch(err => {
+            Alert.alert('안내', err.response.data.data);
+            return {isFailed:true};
+        })
+        return data;
+    }
+    return {postBoard, getBoardDetail, checkScrap, deleteBoard}
 }

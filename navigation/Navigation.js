@@ -29,6 +29,8 @@ import Search from "../screen/(main)/HomeSearch";
 import HomeSearch from "../screen/(main)/HomeSearch";
 import Finish from "../screen/(main)/Home_Finish";
 import PostDetail from "../screen/(main)/PostDetail";
+import BoardUpdateModal from "../modal/BoardUpdateModal";
+import BoardReportModal from "../modal/BoardReportModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -76,6 +78,8 @@ const Navigation = () => {
                     <Stack.Screen name="ResumeDetailModal" component={ResumeDetailModal} />
                     <Stack.Screen name="ResumeUpdateModal" component={ResumeUpdateModal} />
                     <Stack.Screen name="ResumeAddModal" component={ResumeAddModal} />
+                    <Stack.Screen name="BoardUpdateModal" component={BoardUpdateModal} />
+                    <Stack.Screen name="BoardReportModal" component={BoardReportModal} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
