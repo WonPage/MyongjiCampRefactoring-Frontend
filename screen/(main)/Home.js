@@ -22,6 +22,7 @@ function Home(recruitForm){
     const[page, setPage] = useState(0);
     const[buttonVisible, setButtonVisible] = useState(true)
     const {getRecruitList} = useHome();
+    
     useEffect(()=>{
         recruitForm[0] = page
         getRecruitList(recruitForm).then(recruits=>{
@@ -29,13 +30,11 @@ function Home(recruitForm){
             console.log('page', page)
             if(page === 0){
                 tmp = recruits;
-                // setRecruitList(recruits);
             }
             else{
-            tmp = [...recruitList];
-            tmp = tmp.concat(recruits);
+               tmp = [...recruitList];
+               tmp = tmp.concat(recruits);
             }
-           //  console.log('tmp',tmp)
             setRecruitList(tmp)
         })
     },[page]) 
@@ -47,12 +46,8 @@ function Home(recruitForm){
         getRecruitList(next).then(recruits=>{
             if(recruits.length > 1){
                 setPage(page+1);
-            console.log('hihihihihihi')
-
             }
             else{
-               console.log('bibibibbi')
-
                 setButtonVisible(false)
             } 
         })
@@ -62,7 +57,7 @@ function Home(recruitForm){
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicato={false}>
                 {recruitList ? recruitList.map((item, index)=>{
-                 //   console.log('item',item)
+                   console.log('item',item)
                     const date = new Date(item?.modifiedDate);
                     const year = date.getFullYear();
                     const month = date.getMonth() + 1;
