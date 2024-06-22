@@ -117,7 +117,6 @@ const HomeNavigation = () => {
         options={{title:'모집 중'}}/>
         <TopTab.Screen name="Complete" component={Complete}
         options={{title:'모집 완료'}}/>
-        
         <TopTab.Screen name="Finish" component={Finish}
         options={{title:'개발 완료'}}/>
        </TopTab.Navigator>
