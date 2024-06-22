@@ -31,6 +31,7 @@ import Finish from "../screen/(main)/Home_Finish";
 import PostDetail from "../screen/(main)/PostDetail";
 import BoardUpdateModal from "../modal/BoardUpdateModal";
 import BoardReportModal from "../modal/BoardReportModal";
+import CommentReportModal from "../modal/CommentReportModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -81,6 +82,7 @@ const Navigation = () => {
                     <Stack.Screen name="ResumeAddModal" component={ResumeAddModal} />
                     <Stack.Screen name="BoardUpdateModal" component={BoardUpdateModal} />
                     <Stack.Screen name="BoardReportModal" component={BoardReportModal} />
+                    <Stack.Screen name="CommentReportModal" component={CommentReportModal} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>

@@ -1,23 +1,30 @@
 /** 담당자 채윤 
- * 240622 - 글 상세보기 UI, 조회 기능 구현 완료 */
+ * 240622 - 글 상세보기 UI, 조회 기능 구현 완료, 댓글 조회 및 작성, 삭제 기능 구현 */
 import { useEffect, useRef, useState } from "react";
 import useBoard from "../../hook/useBoard";
 import useUsers from "../../hook/useUsers";
 import { useFocusEffect } from "@react-navigation/native";
-import { Image, Keyboard, Pressable, ScrollView, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
+import { Image, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
+import useComment from "../../hook/useComment";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 const PostDetail = ({navigation, route}) => {
     const scrollViewRef = useRef();
     const boxRef = useRef();
     const {boardId} = route.params;
     const {sessionCheck} = useUsers();
-    const {getBoardDetail, checkScrap, deleteBoard} = useBoard();
+    const {getBoardDetail, checkScrap, deleteBoard, scrap} = useBoard();
+    const {getComment, deleteComment} = useComment();
     const [userId, setUserId] = useState();
     const [postData, setPostData] = useState();
     const [isScrap, setIsScrap] = useState();
+    const [commentList, setCommentList] = useState([]);
+    const [replyMode, setReplyMode] = useState(false);
+    const [replyId, setReplyId] = useState();
+    const [replyNickname, setReplyNickname] = useState();
     useFocusEffect(()=>{
         sessionCheck(route);
     })
@@ -34,10 +41,20 @@ const PostDetail = ({navigation, route}) => {
             }
         })
     }
+    const refreshComment = () => {
+        getComment(boardId).then(data=>{
+            if (!data.isFailed){
+                data.commentList.map((value, index)=>{
+                    console.log(index, ':', value);
+                })
+                setCommentList(data.commentList)
+            }
+        })
+    }
     useEffect(()=>{
         refreshBoardDetail();
+        refreshComment();
     },[])
-
     const iconPath = {
         1 : require('../../assets/profile-icon/ai.jpg'),
         2 : require('../../assets/profile-icon/cloud.jpg'),
@@ -63,13 +80,15 @@ const PostDetail = ({navigation, route}) => {
     const handleBoardShare = () => {
         //카카오톡으로 공유하기 구현 예정
     }
-    const handleScrap = () => {}
+    const handleScrap = () => {
+        scrap(boardId).then(data=>{
+            if (!data.isFailed) {
+                refreshBoardDetail();
+            }
+        })
+    }
 
-    /** 댓글 (Comment) Part */
-    const [commentList, setCommentList] = useState([]);
-    const [replyMode, setReplyMode] = useState(false);
-    const [replyId, setReplyId] = useState();
-    const [replyNickname, setReplyNickname] = useState();
+    // 댓글 (Comment) Part
     const handleReply = (commentId, commentUserNickname) => {
         setReplyMode(true);
         setReplyId(commentId);
@@ -89,9 +108,8 @@ const PostDetail = ({navigation, route}) => {
     }
     return(
         <View>
-           <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps={'handled'} contentContainerStyle={{backgroundColor: 'white'}} showsVerticalScrollIndicator={false} >
+           <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps={'handled'} style={{marginBottom:hp('9%')}} contentContainerStyle={{backgroundColor: 'white'}} showsVerticalScrollIndicator={false} >
                 <Pressable onPress={handleReplyModeCancle}>
-                {/* BOARD_DETAIL Part START */}
                 <View style={postData? {marginHorizontal: wp('5%'), marginTop: hp('4%')} : {height:hp('80%')}}>
                 {postData ? (
                 <View>
@@ -103,9 +121,9 @@ const PostDetail = ({navigation, route}) => {
                         </View>
                         <View style={{flexDirection: 'row', alignItems:'center'}}>
                             { postData.writerId === userId ? (<>
-                                {/* 사용자 본인의 글 */}
                                 <TouchableOpacity onPress={()=>{
-                                    navigation.navigate('BoardUpdateModal', {data: postData})
+                                    // 본인 글
+                                    navigation.navigate('BoardUpdateModal', {data: postData, boardId:boardId, callback:refreshBoardDetail})
                                 }}>
                                     <Text>수정</Text>
                                 </TouchableOpacity>
@@ -117,8 +135,8 @@ const PostDetail = ({navigation, route}) => {
                                     <Text style={{marginLeft:hp('1.5%')}}>삭제</Text>
                                 </TouchableOpacity>
                             </>) : (
-                                // 다른 사용자의 글
                                 <TouchableOpacity onPress={()=>{
+                                    // 다른 사용자 글
                                     navigation.navigate('BoardReportModal', {boardId: boardId});
                                 }}>
                                     <Text>신고</Text>
@@ -161,10 +179,9 @@ const PostDetail = ({navigation, route}) => {
                         ))}
                     </View>
                     <View style={{justifyContent:'center', alignItems:'center'}}>
-                        {/* 글쓴이는 '모집 마감하기', 글쓴이가 아닌 사용자는 '지원하기' */}
                         <TouchableOpacity onPress={postData.writerId === userId ? handleRecruitComplete : handleApply}
                             activeOpacity={0.7} style={{ marginTop: hp('6%'), backgroundColor: '#263159', width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? "모집 마감하기" : "지원하기"}</Text>
+                                <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? ('모집 마감하기') : ('지원하기')}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{flexDirection:'row', justifyContent:'flex-end', marginTop:hp('4%'), marginBottom:hp('1.5%'), marginRight:wp('2%')}}>
@@ -177,150 +194,185 @@ const PostDetail = ({navigation, route}) => {
                     </View>
                 </View>) : <Loading/> }
                 </View>
-                {/* BOARD_DETAIL Part END */}
 
-                {/* COMMENT Part START */}
-                <View style={ commentList ? {borderTopWidth: 2, marginHorizontal: wp('6%'), paddingVertical:hp('1%')} : {borderTopWidth: 2, marginHorizontal: wp('6%')}}>
-                    {commentList.length !== 0 ? commentList.map((comment, index) => {
-                        const date = new Date(comment.commentCreateDate);
-                        const currentDate = new Date();
-                        const diffTime = Math.abs(currentDate - date);
-                        const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-                        const year = date.getFullYear();
-                        const month = date.getMonth() + 1;
-                        const day = date.getDate();
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const longFormat = `${year}.${month}.${day}`
-                        const nowFormat = `${hours}:${minutes}`
-                        return (
-                            <View key={index}>
-                                <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('-1.5%') }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: '2%', marginRight: '3%', marginTop: hp('0.5%') }}>
-                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            {/* <Image source={require(`../../../assets/icon/profile-icon-${comment.profileIcon}.png`)}/> */}
-                                            <Image source={iconPath[comment.profileIcon]} style={{ borderRadius: 50, width: hp('3.5%'), height: hp('3.5%'), marginRight: hp('1%') }} />
-                                            <Text style={{ marginRight: hp('1.5%'), fontWeight: '500' }}>{comment.nickname}</Text>
-                                            <Text style={{ color: 'gray', fontSize: 12 }}>{diffHours < 24 ? nowFormat : longFormat}</Text>
-                                        </View>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            { // 사용자가 댓글 작성자인 경우
-                                                userId === comment.writerId ? (<>
-                                                    <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
-                                                        <Text style={{ fontSize: 13 }}>댓글</Text>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity onPress={async () => {
-                                                        navigation.navigate('ModalLayout', { component: 'SelectAlert', title: '안내', message: '정말로 삭제하시겠습니까?', action: 'deleteComment', data: { boardId: boardId, commentId: comment.id } });
-                                                    }}>
-                                                        <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
-                                                    </TouchableOpacity>
-                                                </>) :
-                                                    // 사용자가 게시글 작성자인 경우
-                                                    userId === writerId ? (<>
-                                                        <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
-                                                            <Text style={{ fontSize: 13 }}>댓글</Text>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity onPress={() => {
-                                                            setTargetId(comment.id);
-                                                            setReportType('Comment');
-                                                            setReportModalVisible(true);
-                                                        }}>
-                                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
-                                                        </TouchableOpacity>
-                                                    </>) : comment.isSecret === 1 ? (<>
-                                                        <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
-                                                            <Text style={{ fontSize: 13 }}>댓글</Text>
-                                                        </TouchableOpacity>
-                                                    </>) : (<>
-                                                        <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
-                                                            <Text style={{ fontSize: 13 }}>댓글</Text>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity onPress={() => {
-                                                            setTargetId(comment.id);
-                                                            setReportType('Comment');
-                                                            setReportModalVisible(true);
-                                                        }}>
-                                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
-                                                        </TouchableOpacity>
-                                                    </>)}
-                                        </View>
-                                    </View>
-                                    {userId === comment.writerId || userId === writerId || comment.isSecret === 0 ? (
-                                        <Text style={{ margin: hp('1%') }}>{comment.content}</Text>
-                                    ) : (
-                                        <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
-                                    )}
-                                </View>
-                                {comment.children.map((comment, index) => (
-                                    <View key={index} style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: hp('1%'), }}>
-                                        <Feather style={{ marginLeft: '5%', marginTop: hp('1%') }} name="corner-down-right" size={20} color="black" />
-                                        <View style={{ backgroundColor: '#F0F1F2', borderRadius: 15, padding: 5, marginLeft: '3%', flex: 1 }}>
-                                            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: '2%', marginRight: '4%', marginTop: hp('0.5%') }}>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    {/* <Image source={require(`../../../assets/icon/profile-icon-${comment.profileIcon}.png`)}/> */}
-                                                    <Image source={iconPath[comment.profileIcon]} style={{ borderRadius: 50, width: hp('3.5%'), height: hp('3.5%'), marginRight: hp('1%') }} />
-                                                    <Text style={{ marginRight: hp('1.5%'), fontWeight: '500' }}>{comment.nickname}</Text>
-                                                    <Text style={{ color: 'gray', fontSize: 12 }}>{diffHours < 24 ? nowFormat : longFormat}</Text>
-                                                </View>
-                                                <View style={{ flexDirection: 'row' }}>
-                                                    { //사용자가 댓글 작성자 일 때 
-                                                        userId === comment.writerId ? (<>
-                                                            <TouchableOpacity onPress={async () => {
-                                                                navigation.navigate('ModalLayout', { component: 'SelectAlert', title: '안내', message: '정말로 삭제하시겠습니까?', action: 'deleteComment', data: { boardId: boardId, commentId: comment.id } });
-                                                            }}>
-                                                                <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
-                                                            </TouchableOpacity>
-                                                        </>) :
-                                                            // 사용자가 게시글 작성자 일 때
-                                                            userId === writerId ? (<>
-                                                                <TouchableOpacity onPress={() => {
-                                                                    setTargetId(comment.id);
-                                                                    setReportType('Comment');
-                                                                    setReportModalVisible(true);
-                                                                }}>
-                                                                    <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
-                                                                </TouchableOpacity>
-                                                            </>) :
-                                                                // 댓글이 비밀댓글이면 (그 외 사용자에게 사용)
-                                                                comment.isSecret === 1 ? (<>
-                                                                </>
-                                                                ) :
-                                                                    // 댓글이 공개댓글이면 (그 외 사용자에게 사용)
-                                                                    (<>
-                                                                        <TouchableOpacity onPress={() => {
-                                                                            setTargetId(comment.id);
-                                                                            setReportType('Comment');
-                                                                            setReportModalVisible(true);
-                                                                        }}>
-                                                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
-                                                                        </TouchableOpacity>
-                                                                    </>)}
-                                                </View>
-                                            </View>
-                                            { // 사용자가 댓글 작성자거나 게시글 작성자이거나 비밀댓글이 아닌 경우
-                                                userId === comment.writerId || userId === writerId || comment.isSecret === 0 ? (
-                                                    <Text style={{ margin: hp('1%') }}>{comment.content}</Text>
-                                                ) :
-                                                    // 댓글이 비밀댓글인지 (비밀댓글이면서 댓글,게시글 작성자도 아님)
-                                                    (
-                                                        <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
-                                                    )}
-                                        </View>
-                                    </View>
-                                ))}
-                            </View>
-                        )
-                    }) : (
-                        <View style={{ marginVertical: hp('1%'), justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 15, height: hp('10%') }}>
-                            <Text style={{ fontSize: 16, color: 'gray' }}>댓글이 존재하지 않습니다.</Text>
-                        </View>
-                    )}
-                </View>
-                {/* COMMENT Part END */}
+                <Comment navigation={navigation} commentList={commentList} iconPath={iconPath} userId={userId} writerId={postData?.writerId} boardId={boardId}
+                deleteComment={deleteComment} refreshComment={refreshComment} handleReply={handleReply}/>
                 </Pressable>
             </ScrollView>
+            <CommentPush boardId={boardId} scrollViewRef={scrollViewRef} refreshComment={refreshComment} boxRef={boxRef} replyMode={replyMode} replyId={replyId} setReplyMode={setReplyMode} setReplyId={setReplyId} replyNickname={replyNickname} setReplyNickname={setReplyNickname}/>
         </View>
     )
 }
 
+function Comment({navigation, commentList, iconPath, userId, writerId, boardId, deleteComment, refreshComment, handleReply}) {
+    return (
+        <View style={ commentList ? {borderTopWidth: 2, marginHorizontal: wp('6%'), paddingVertical:hp('1%')} : {borderTopWidth: 2, marginHorizontal: wp('6%')}}>
+        {commentList.length > 0 ? commentList.map((comment) => {
+            const date = new Date(comment.commentCreateDate);
+            const currentDate = new Date();
+            const diffTime = Math.abs(currentDate - date);
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const longFormat = `${year}.${month}.${day}`
+            const nowFormat = `${hours}:${minutes}`
+            return (
+                <View key={comment.id}>
+                    <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Image source={iconPath[comment.profileIcon]} style={{ borderRadius: 50, width: wp('7%'), height: hp('3.5%'), marginRight: wp('2%') }} />
+                                <Text style={{ marginRight: wp('3%'), fontWeight: '500' }}>{comment.nickname}</Text>
+                                <Text style={{ color: 'gray', fontSize: 12 }}>{diffHours < 24 ? nowFormat : longFormat}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                { comment.writerId === userId ? (<>
+                                    <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
+                                        <Text style={{ fontSize: 13 }}>댓글</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={()=>deleteComment(boardId, comment.id).then(data=>{
+                                        if (!data.isFailed) {refreshComment();}
+                                    })}>
+                                        <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
+                                    </TouchableOpacity></>) : writerId === userId ? (<>
+                                    <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
+                                        <Text style={{ fontSize: 13 }}>댓글</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => {
+                                        navigation.navigate('CommentReportModal', {commentId: comment.id});
+                                    }}>
+                                        <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
+                                    </TouchableOpacity></>) : comment.isSecret === 1 ? (
+                                    <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
+                                        <Text style={{ fontSize: 13 }}>댓글</Text>
+                                    </TouchableOpacity>) : (<>
+                                    <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
+                                        <Text style={{ fontSize: 13 }}>댓글</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => {
+                                        navigation.navigate('CommentReportModal', {commentId: comment.id});
+                                    }}>
+                                        <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
+                                    </TouchableOpacity></>)}
+                            </View>
+                        </View>
+                        {comment.writerId===userId||writerId === userId||comment.isSecret === 0 ? (
+                            <Text style={{ margin: hp('1%') }}>{comment.content}</Text>
+                        ) : (
+                            <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
+                        )}
+                    </View>
+                    {comment.children.map((comm) => (
+                        <View key={comm.id} style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: hp('1%'), }}>
+                            <Feather style={{ marginLeft: wp('5%'), marginTop: hp('1%') }} name="corner-down-right" size={20} color="black" />
+                            <View style={{ backgroundColor: '#F0F1F2', borderRadius: wp('5%'), padding: wp('2%'), marginLeft: wp('3%'), flex: 1 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('4%'), marginTop: hp('0.5%') }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image source={iconPath[comm.profileIcon]} style={{ borderRadius: wp('7%'), width: wp('7%'), height: hp('3.5%'), marginRight: wp('2%') }} />
+                                        <Text style={{ marginRight: wp('3%'), fontWeight: '500' }}>{comm.nickname}</Text>
+                                        <Text style={{ color: 'gray', fontSize: 12 }}>{diffHours < 24 ? nowFormat : longFormat}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                    { userId === comm.writerId ? (
+                                        <TouchableOpacity onPress={()=>deleteComment(boardId, comm.id).then(data=>{
+                                            if (!data.isFailed) {refreshComment();}
+                                        })}>
+                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
+                                        </TouchableOpacity>) :
+                                    userId === writerId ? (
+                                        <TouchableOpacity onPress={() => {
+                                            navigation.navigate('CommentReportModal', {commentId: comm.id});
+                                        }}>
+                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
+                                        </TouchableOpacity>) : 
+                                    comm.isSecret === 1 ? (<View></View>) : (
+                                        <TouchableOpacity onPress={() => {
+                                            navigation.navigate('CommentReportModal', {commentId: comm.id});
+                                        }}>
+                                            <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>신고</Text>
+                                        </TouchableOpacity>)}
+                                    </View>
+                                </View>
+                                {comm.writerId === userId || writerId === userId || comm.isSecret === 0 ? (
+                                    <Text style={{ margin: hp('1%') }}>{comm.content}</Text>
+                                ) : (
+                                    <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
+                                )}
+                            </View>
+                        </View>
+                    )) }
+                </View>
+            )}) : (
+            <View style={{ marginVertical: hp('1%'), justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 15, height: hp('10%') }}>
+                <Text style={{ fontSize: 16, color: 'gray' }}>댓글이 존재하지 않습니다.</Text>
+            </View>
+            )}
+    </View>
+    )
+}
+
+function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, setReplyId, replyNickname, setReplyNickname, boxRef, refreshComment}){
+    const [comment, setComment] = useState('');
+    const [isSecret, setIsSecret] = useState(false);
+    const {writeComment} = useComment();
+    const handleCommentSubmit = () => {
+        writeComment(boardId, comment, (replyMode===true?1:0), isSecret, (replyId?replyId:undefined))
+        .then(response=>{
+            if (!response.isFailed) {
+                setComment(''); // 댓글 작성 후 입력창 초기화
+                setReplyMode(undefined);
+                setReplyId(undefined);
+                setReplyNickname(undefined);
+                refreshComment();
+            }
+        })
+        .finally(()=>{
+            scrollViewRef.current.scrollToEnd({ animated: true });
+        })
+    }
+    useEffect(()=>{
+        setComment('');
+    },[replyMode])
+    return (
+        <>
+        {replyMode ? (
+                <View style={[styles.comment_push_container]}>
+                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('5%'), height: hp('2.5%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:hp('3%') }}
+                        isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} />
+                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray', textAlignVertical:'center', marginLeft:wp('-3%'), marginRight:wp('2%')}}>비밀</Text>
+                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
+                        value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
+                    <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
+                        style={{ width: wp('15%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
+                        <Text style={{ color: 'white' }}>대댓</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View style={[styles.comment_push_container]}>
+                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('5%'), height: hp('2.5%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:hp('3%') }}
+                        isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} fillColor="#495579"/>
+                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray' ,textAlignVertical:'center', marginLeft:wp('-3%'), marginRight:wp('2%')}}>비밀</Text>
+                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
+                        value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
+                    <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
+                        style={{ width: wp('13%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
+                        <Text style={{ color: 'white' }}>작성</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+        </>
+    )
+}
+const styles = StyleSheet.create({
+    comment_push_container: {
+        paddingVertical:hp('0.7%'),
+        borderWidth:2, borderColor:'gray', borderRadius: wp('5%'),
+        paddingHorizontal:wp('3%'), backgroundColor:'white',
+        position: 'absolute', bottom:0, justifyContent:'space-between',
+        flexDirection:'row',width:wp('100%'), height:hp('9%')
+    },
+})
 export default PostDetail;

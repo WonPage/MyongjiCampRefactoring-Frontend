@@ -1,8 +1,8 @@
 /** 담당자 채윤 
- * 240622 - 게시판 작성하기, 상세보기 조회 */
+ * 240622 - 게시판 작성하기, 상세보기 조회, 스크랩 기능 구현 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function useBoard(){
@@ -66,7 +66,7 @@ export default function useBoard(){
     }
     /** 게시글 상세보기 */
     const getBoardDetail = async(boardId) => {
-        const token = JSON.parse(await AsyncStorage.getItem('token'));
+    const token = JSON.parse(await AsyncStorage.getItem('token'));
         const data = axios.get(`${API_URL}/api/auth/recruit/${boardId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
@@ -123,5 +123,58 @@ export default function useBoard(){
         })
         return data;
     }
-    return {postBoard, getBoardDetail, checkScrap, deleteBoard}
+    /** 스크랩하기 */
+    const scrap = async(boardId) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.post(`${API_URL}/api/auth/scrap/${boardId}`, {}, {
+            headers: {
+                'Content-Type':'application/json',
+                Authorization: `Bearer ${token.token}`,
+            }
+        })
+        .then(res => {
+            if (res.data.status===200){
+                ToastAndroid.show(res.data.data, ToastAndroid.SHORT);
+                return {isFailed:false}
+            } else {
+                return {isFailed:true}
+            }
+        })
+        .catch(err => {
+            return {isFailed:true}
+        })
+        return data;
+    }
+    /** 게시글 수정하기 */
+    const updateBoard = async(updateData) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.put(`${API_URL}/api/auth/recruit/${updateData.boardId}`, {
+            title:updateData.title,
+            content:updateData.content,
+            status :updateData.status,
+            preferredLocation:updateData.preferredLocation,
+            expectedDuration:updateData.expectedDuration,
+            roleAssignments:updateData.roleAssignments
+        }, {
+            headers : {
+                'Content-Type':'application/json',
+                Authorization: `Bearer ${token.token}`,
+            }
+        })
+        .then(res => {
+            if (res.data.status===200){
+                Alert.alert('안내', res.data.data);
+                return {isFailed:false}
+            } else {
+                Alert.alert('안내', res.data.data);
+                return {isFailed:true}
+            }
+        })
+        .catch(err => {
+            Alert.alert('안내', err.response.data.data);
+            return {isFailed:true}
+        })
+        return data;
+    }
+    return {postBoard, getBoardDetail, checkScrap, deleteBoard, scrap, updateBoard}
 }
