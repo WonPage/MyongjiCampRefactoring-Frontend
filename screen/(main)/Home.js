@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import useHome from "../../hook/useHome";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import Loading from "../(other)/Loading";
@@ -16,50 +16,77 @@ export function Complete(){
 }
 
 function Home(recruitForm){
-     const [recruitList, setRecruitList] = useState(null);
+    const navigation = useNavigation();
+    const [recruitList, setRecruitList] = useState(null);
     // null일 때 로딩창 0개일 때 게시글 없다 1개 이상일 때 게시글
     const[page, setPage] = useState(0);
-  //  const[recruitForm, setRecruitForm] = useState([0,'DESC','recruit','ongoing']);
+    const[buttonVisible, setButtonVisible] = useState(true)
     const {getRecruitList} = useHome();
     useEffect(()=>{
-        console.log("durl")
-      //  console.log(recruitForm)
+        recruitForm[0] = page
         getRecruitList(recruitForm).then(recruits=>{
-        setRecruitList(recruits);
-        console.log('recuits',recruits)
+            let tmp = null;
+            console.log('recruitForm',recruitForm)
+
+            if(page === 0){
+                tmp = recruits;
+                // setRecruitList(recruits);
+            }
+            else{
+                 if(recruits.length > 1){
+                  tmp = [...recruitList];
+                //  tmp.push(recruits); 
+                }
+                else{
+                    setButtonVisible(false)
+                } 
+            }
+            console.log('tmp',tmp)
+
+            setRecruitList(tmp)
         })
-    },[]) 
+    },[page]) 
+
+    const handleMoreButton = () => {
+        setPage(page+1);
+     //   console.log('recruitForm',recruitForm)
+    }
+
+
+
  
-    //page가 아닌 게시글 수가 늘어나게
     // 다른 페이지에 갔다가 돌아오면 page가 0으로 되게 -> unmountblur?
     // 이 부분 잘 되었는지 게시글 추가 시키고 확인
-    const handleRecruitMoreButton = () => {
+/*     const handleRecruitMoreButton = () => {
      //   setRecruitForm([page,'DESC','recruit','ongoing'])
      //   setPage(page+1)
      //   console.log('button',recruitForm)
         let tmp = [...recruitList];
      //       setRecruitForm([page,'DESC','recruit','ongoing'])
-        let UpdatedRecruitForm = recruitForm
+         let UpdatedRecruitForm = recruitForm
         console.log('old ',UpdatedRecruitForm)
-        UpdatedRecruitForm[0] = page+1;
-        console.log('new ', UpdatedRecruitForm)
+        UpdatedRecruitForm[0] = page+1; 
+        // console.log('new ', UpdatedRecruitForm)
+        recruitForm[0] = page+1
         getRecruitList(UpdatedRecruitForm).then(recruits=>{
             if(recruits.length < 1){
-                console.log('마지막 페이지')
+             //   console.log('마지막 페이지')
+                console.log('recruit.length',recruits.length)
             }
             else{
-                tmp.push(recruits);
-            }
-            setPage(page+1)
+                setPage(page+1)
 
-            
+                tmp.push(recruits);
+
+                console.log('more recruit',recruits)
+            }
         })
         console.log('page',page)
         console.log('tmp',tmp)
 
         setRecruitList(tmp)
 
-    }
+    } */
 
     return(
         <View style={styles.container}>
@@ -75,7 +102,7 @@ function Home(recruitForm){
                     const dateFormat = `${year}.${newMonth}.${day}  ${hours}:${minutes}`
                     return(
                     //    여기에 onPress로 상세게시글 가야됨 
-                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>{moveDetail(item.boardId)}}>
+                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostDetail', {boardId: item.boardId})} >
                     <View style={{ borderRadius: 10, height:hp('22%'), marginBottom:hp('1.5%'), elevation:1,
                     backgroundColor:'white', padding:hp('1.5%'), justifyContent:'space-between'}}>
                         <View>
@@ -115,12 +142,14 @@ function Home(recruitForm){
                     )
 
                 }):(<Loading/>)}
+                {buttonVisible?
                 <View
-                style={{justifyContent:'center', alignItems:'center', height:hp('8%'), marginBottom:hp('1%')}}>
-                    <TouchableOpacity onPress={handleRecruitMoreButton} style={{borderRadius:16, backgroundColor:'gray', padding:hp('1.5%')}}>
-                        <Text style={{color:'white'}}>더 보기</Text>
+                   style={{justifyContent:'center', alignItems:'center', height:hp('8%'), marginBottom:hp('1%')}}>
+                    
+                    <TouchableOpacity onPress={handleMoreButton} style={{borderRadius:16, backgroundColor:'gray', padding:hp('1.5%')}}>
+                        <Text style={{color:'white'}} >더 보기</Text>
                     </TouchableOpacity>
-                </View>
+                </View>:null}
 
             </ScrollView>
         </View>
