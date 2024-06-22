@@ -60,7 +60,8 @@ const Navigation = () => {
                 {/* Important Page */}
                 <Stack.Screen name="Post" component={Post}
                 options={{headerTitle:'글 작성',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
-                <Stack.Screen name="PostDetail" component={PostDetail} />
+                <Stack.Screen name="PostDetail" component={PostDetail}
+                options={option=>({title:option.route.params.title, headerTitleAlign:'center'})} />
                 <Stack.Screen name="Resume" component={Resume}
                 options={{title: '이력서', headerTitleAlign: 'center', headerTitleStyle:{fontSize: 28}}}  />
 

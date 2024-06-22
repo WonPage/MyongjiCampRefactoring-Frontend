@@ -68,7 +68,7 @@ function Home(recruitForm){
                     const dateFormat = `${year}.${newMonth}.${day}  ${hours}:${minutes}`
                     return(
                     //    여기에 onPress로 상세게시글 가야됨 
-                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostDetail', {boardId: item.boardId})} >
+                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostDetail', {boardId: item.boardId, title: recruitForm[3]==='ongoing'?'모집 중':'모집 완료'})} >
                     <View style={{ borderRadius: 10, height:hp('22%'), marginBottom:hp('1.5%'), elevation:1,
                     backgroundColor:'white', padding:hp('1.5%'), justifyContent:'space-between'}}>
                         <View>
