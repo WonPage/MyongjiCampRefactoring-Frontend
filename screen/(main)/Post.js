@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240622 - 글 쓰기 페이지 UI 및 기능 구현 완료 */
 import { useRef, useState } from "react";
 import useUsers from "../../hook/useUsers"
 import { useFocusEffect } from "@react-navigation/native";

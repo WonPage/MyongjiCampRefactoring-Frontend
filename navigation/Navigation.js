@@ -28,6 +28,7 @@ import Home from "../screen/(main)/Home";
 import Search from "../screen/(main)/HomeSearch";
 import HomeSearch from "../screen/(main)/HomeSearch";
 import Finish from "../screen/(main)/Home_Finish";
+import PostDetail from "../screen/(main)/PostDetail";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -57,6 +58,7 @@ const Navigation = () => {
                 {/* Important Page */}
                 <Stack.Screen name="Post" component={Post}
                 options={{headerTitle:'글 작성',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
+                <Stack.Screen name="PostDetail" component={PostDetail} />
                 <Stack.Screen name="Resume" component={Resume}
                 options={{title: '이력서', headerTitleAlign: 'center', headerTitleStyle:{fontSize: 28}}}  />
 

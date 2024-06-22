@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 이력서 수정 모달 UI 및 기능 구현 완료 */
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";

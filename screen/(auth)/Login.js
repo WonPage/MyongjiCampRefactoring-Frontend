@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240612 - 로그인 페이지 UI 및 기능 구현 완료 */
 import { useRef, useState } from "react";
 import { Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";

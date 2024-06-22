@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 네트워크 문제 페이지 */
 import { View, Text, Modal, StyleSheet } from 'react-native';
 
 const NetworkErrorModal = ({ visible }) => {

@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 네트워크 문제 페이지 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

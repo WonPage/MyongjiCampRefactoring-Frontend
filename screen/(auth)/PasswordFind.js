@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240620 - 비밀번호 찾기 페이지 UI 및 기능 구현 완료 */
 import { useState } from "react";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";

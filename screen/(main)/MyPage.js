@@ -1,3 +1,6 @@
+/** 담당자 채윤 
+ * 240612 - 페이지 UI 디자인 완료 
+ * 240613 - 닉네임, 아이콘 변경 오류 해결 */
 import { useFocusEffect } from "@react-navigation/native";
 import useUsers from "../../hook/useUsers";
 import { useEffect, useState } from "react";

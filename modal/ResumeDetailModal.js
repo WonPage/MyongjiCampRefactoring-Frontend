@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 이력서 상세보기 모달 UI 및 기능 구현 완료 */
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import useResume from "../hook/useResume";

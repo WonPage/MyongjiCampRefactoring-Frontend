@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 이력서 목록, 상세보기 페이지 UI 및 기능 구현 완료 */
 import { useEffect, useState } from "react";
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useResume from "../../hook/useResume";

@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240621 - 회원가입 페이지 UI 및 기능 구현 완료 */
 import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, TouchableOpacity } from "react-native";
 import * as Progress from 'react-native-progress';

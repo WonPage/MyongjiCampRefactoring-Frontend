@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240618 - 지원현황 페이지 UI 디자인 완료 */ 
 import { useEffect, useState } from "react";
 import useUsers from "../../hook/useUsers";
 import { useFocusEffect } from "@react-navigation/native";

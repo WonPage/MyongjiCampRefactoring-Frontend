@@ -1,3 +1,5 @@
+/** 담당자 채윤 
+ * 240620 - 비밀번호 변경 페이지 UI 및 기능 구현 완료 */
 import { useFocusEffect } from "@react-navigation/native";
 import useUsers from "../../hook/useUsers";
 import { Alert, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
