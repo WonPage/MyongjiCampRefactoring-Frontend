@@ -13,6 +13,10 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android":{
+        "serviceAccountKeyPath":"mjcamp-67915-5a39c16c7bcf.json"
+      }
+    }
   }
 }

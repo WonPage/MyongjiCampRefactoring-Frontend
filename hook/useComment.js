@@ -52,16 +52,18 @@ export default function useComment(){
             return {isFailed:true};
         }
         const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'))
         const data = axios.post(`${API_URL}/api/auth/recruit/${boardId}/comment`, {
             content: comment,
             cdepth: cdepth,
             isSecret: (isSecret ? 1 : 0),
-            parentId: (writer?writer:undefined)
+            parentId: (writer?writer:undefined),
+            expoToken:expoToken
         }, {
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}` },
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}`},
         }).then(res=>{
             if (res.data.status===200){
-                Alert.alert('안내', res.data.data);
+                Alert.alert('안내', res.data.data); 
                 return {isFailed:false};
             } else {
                 Alert.alert('안내', res.data.data);
