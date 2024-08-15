@@ -11,6 +11,7 @@ export default function useResume(){
             headers: {Authorization: `Bearer ${token.token}`}
         })
         .then(res => {
+            console.log(res.data);
             return res.data.data;
         })
         .catch(err => {

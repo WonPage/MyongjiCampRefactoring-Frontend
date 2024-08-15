@@ -10,11 +10,13 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 const Resume = ({navigation}) => {
     const [resumeList, setResumeList] = useState(null);
     const {getResumeList} = useResume();
-    useFocusEffect(()=>{
+    useEffect(()=>{
         getResumeList().then(resumes=>{
             setResumeList(resumes);
         })
-    })
+        const refresh = navigation.addListener('focus', ()=>{getResumeList();});
+        return refresh;
+    },[])
     const handleResumeAdd = () => {
         navigation.navigate('ResumeAddModal');
     }
