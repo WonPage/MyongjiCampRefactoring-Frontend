@@ -24,14 +24,20 @@ import ResumeUpdateModal from "../modal/ResumeUpdateModal";
 import ResumeAddModal from "../modal/ResumeAddModal";
 import OnGoing, { Complete } from "../screen/(main)/Home";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Home from "../screen/(main)/Home";
-import Search from "../screen/(main)/HomeSearch";
 import HomeSearch from "../screen/(main)/HomeSearch";
 import Finish from "../screen/(main)/Home_Finish";
 import PostDetail from "../screen/(main)/PostDetail";
 import BoardUpdateModal from "../modal/BoardUpdateModal";
 import BoardReportModal from "../modal/BoardReportModal";
 import CommentReportModal from "../modal/CommentReportModal";
+import BoardDeleteModal from "../modal/BoardDeleteModal";
+import CommentDeleteModal from "../modal/CommentDeleteModal";
+import Search from "../screen/(main)/Search";
+import SearchResult from "../screen/(main)/SearchResult";
+import ReportModal from "../modal/ReportModal";
+import ApplyMenuModal from "../modal/ApplyMenuModal";
+import RecruitCompleteCheckModal from "../modal/RecruitCompleteCheckModal";
+import ApplyModal from "../modal/ApplyModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -57,6 +63,10 @@ const Navigation = () => {
                 options={{headerShown: false, headerMode:'screen', cardStyleInterpolator:(Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid) }}/>
                 <Stack.Screen name="Notification" component={Notification}
                 options={{headerTitle: '알림', headerTitleAlign: 'center', cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forFadeFromBottomAndroid)}}/>
+                <Stack.Screen name="Search" component={Search}
+                options={{headerTitle: '검색', headerTitleAlign: 'center', cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forFadeFromBottomAndroid)}}/>
+                <Stack.Screen name="SearchResult" component={SearchResult}
+                options={{headerTitle: '검색 결과', headerTitleAlign: 'center', cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forFadeFromBottomAndroid)}}/>
 
                 {/* Important Page */}
                 <Stack.Screen name="Post" component={Post}
@@ -83,6 +93,12 @@ const Navigation = () => {
                     <Stack.Screen name="BoardUpdateModal" component={BoardUpdateModal} />
                     <Stack.Screen name="BoardReportModal" component={BoardReportModal} />
                     <Stack.Screen name="CommentReportModal" component={CommentReportModal} />
+                    <Stack.Screen name="BoardDeleteModal" component={BoardDeleteModal} />
+                    <Stack.Screen name="CommentDeleteModal" component={CommentDeleteModal}/>
+                    <Stack.Screen name="ReportModal" component={ReportModal} />
+                    <Stack.Screen name="ApplyMenuModal" component={ApplyMenuModal} />
+                    <Stack.Screen name="RecruitCompleteCheckModal" component={RecruitCompleteCheckModal} />
+                    <Stack.Screen name="ApplyModal" component={ApplyModal} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
@@ -116,19 +132,19 @@ const MainNavigation = ({navigation}) => {
     )
 }
 
-
-
-
 const HomeNavigation = () => {
     return (
-        <TopTab.Navigator>
-        <TopTab.Screen name="OnGoing" component={OnGoing} 
+        <>
+        <HomeSearch/>
+        <TopTab.Navigator screenOptions={{swipeEnabled:false, tabBarLabelStyle:{fontSize:20, fontWeight:500, color:'white'}, tabBarStyle:{backgroundColor:'#495579', elevation:0}, tabBarIndicatorStyle:{backgroundColor:'#FFFBEB'}}}>
+        <TopTab.Screen name="OnGoing" component={OnGoing}
         options={{title:'모집 중'}}/>
         <TopTab.Screen name="Complete" component={Complete}
         options={{title:'모집 완료'}}/> 
         <TopTab.Screen name="Finish" component={Finish}
         options={{title:'개발 완료'}}/>
-       </TopTab.Navigator>
+        </TopTab.Navigator>
+        </>
     )
 }
 

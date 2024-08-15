@@ -176,5 +176,28 @@ export default function useBoard(){
         })
         return data;
     }
-    return {postBoard, getBoardDetail, checkScrap, deleteBoard, scrap, updateBoard}
+
+    /** 스크랩한 글 목록 가져오기 */
+    const getScrapList = async(boardType) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const data = axios.get(`${API_URL}/api/auth/scrap?boardType=${boardType}`, { 
+            headers: {Authorization: `Bearer ${token.token}`}
+        })
+        .then(res => {
+            if (res.status===200){
+                return {isFailed: false, scrapList: res.data.data}
+            } else {
+                return {isFailed: true}
+            }
+        })
+        .catch(err => {
+            console.log('스크랩 목록 불러오기 오류 :',err.response.data);
+            Alert.alert('안내', '스크랩 목록 불러오기에 실패하였습니다.');
+            return {isFailed: true};
+        })
+        return data;
+          
+    }
+
+    return {postBoard, getBoardDetail, checkScrap, deleteBoard, scrap, updateBoard, getScrapList}
 }

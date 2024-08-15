@@ -1,73 +1,152 @@
 /** 담당자 채윤 
  * 240618 - 지원서 훅 설계 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import axios from "axios"
+import { Alert } from "react-native";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export default function useApply(){
-    async function getAppliedResume(){
-            const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const result = axios.get(`${API_URL}/api/auth/apply/applicant`,{
-                    headers: {
-                            Authorization: `Bearer ${token.token}`
-                    },
-            })
+export default function useApply() {
+    const navigation = useNavigation();
+
+    async function getAppliedResume() {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/apply/applicant`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
             .then(res => {
-                    return res.data;
+                return res.data;
             })
-            return result;
+        return result;
     }
-    async function getReceivedResume(){
-            const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const result = axios.get(`${API_URL}/api/auth/apply/writer`,{
-                    headers: {
-                            Authorization: `Bearer ${token.token}`
-                    },
-            })
+    async function getReceivedResume() {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/apply/writer`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
             .then(res => {
-                    return res.data;
+                return res.data;
             })
-            return result;
+        return result;
     }
-    async function getResumeDetail(resumeId){
-            const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const result = axios.get(`${API_URL}/api/auth/apply/detail/${resumeId}`,{
-                    headers: {
-                            Authorization: `Bearer ${token.token}`
-                    },
-            })
+    async function getResumeDetail(resumeId) {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/apply/detail/${resumeId}`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
             .then(res => {
-                    return res.data;
+                return res.data;
             })
-            return result;
+        return result;
     }
     async function getReceivedResumeList(boardId) {
-            const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const result = axios.get(`${API_URL}/api/auth/apply/list/${boardId}`,{
-                    headers: {
-                            Authorization: `Bearer ${token.token}`
-                    },
-            })
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/apply/list/${boardId}`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
             .then(res => {
-                    return res.data;
+                return res.data;
             })
-            return result;
+        return result;
     }
     async function resumeProcess(type, resumeId) {
-            const token = JSON.parse(await AsyncStorage.getItem('token'));
-            if (type === 'Accept') {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        if (type === 'Accept') {
 
+        }
+        const result = axios.put(`${API_URL}/api/auth/apply/first/${resumeId}`, {}, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token.token}`
+            },
+        })
+            .then(res => {
+                return res.data;
+            })
+        return result;
+    }
+    async function cancleApply(applyId) {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        axios.delete(`${API_URL}/api/auth/apply/${applyId}`, {
+            headers: { Authorization: `Bearer ${token.token}` }
+        })
+        .then(res => {
+            if (res.data.status === 200) {
+                Alert.alert("지원이 취소었습니다.");
+            } else {
+                Alert.alert("지원 취소를 실패했습니다.");
             }
-            const result = axios.put(`${API_URL}/api/auth/apply/first/${resumeId}`,{},{
-                    headers: {
-                            'Content-Type':'application/json',
-                            Authorization: `Bearer ${token.token}`
-                    },
+        })
+        .catch(err => {
+            Alert.alert("지원 취소를 실패했습니다.");
+        })
+    }
+    async function completeRecruit(boardId, boardData) {
+        const boardDataList = boardData.roleAssignments.filter(role=>role.appliedNumber>0);
+        if (boardDataList.length === 0){
+            Alert.alert("모집된 인원이 한 명도 없습니다.");
+            return {isFailed:true};
+        }
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const putData = {
+            title: boardData.title,
+            content: boardData.content,
+            status: "RECRUIT_COMPLETE",
+            preferredLocation: boardData.preferredLocation,
+            expectedDuration: boardData.expectedDuration,
+            roleAssignments: boardDataList
+        }
+        const data = axios.put(`${API_URL}/api/auth/recruit/${boardId}`, putData, {
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}` }
+        })
+        .then(res => {
+            if (res.data.status === 200) {
+                Alert.alert("모집 마감되었습니다.");
+                navigation.replace('MainNavigation');
+                return {isFailed:false};
+            } else {
+                Alert.alert("모집 마감을 실패했습니다.");
+                return {isFailed:true};
+            }
+        })
+        .catch(err => {
+            Alert.alert("모집 마감을 실패했습니다.");
+            return {isFailed:true};
+        })
+        return data;
+    }
+
+    /** 지원 보내기 */
+    const sendApply = async(boardId, resumeId, selectedRole) => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        axios.get(`${API_URL}/api/auth/resume/${resumeId}`)
+        .then(res => {
+            const content = res.data.data.content;
+            const url = res.data.data.url;
+            const inputData = {
+                role : selectedRole,
+                content : content,
+                url : url
+            }
+            axios.post(`${API_URL}/api/auth/apply/${boardId}`, inputData, {
+                headers: { Authorization: `Bearer ${token.token}`, "Content-Type":"application/json" }
             })
             .then(res => {
-                    return res.data;
+                navigation.goBack();
+                Alert.alert("안내", res.data.data);
             })
-            return result;
+        })
     }
-    return {getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, resumeProcess}
+
+    return { getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, resumeProcess, cancleApply, completeRecruit,
+        sendApply
+     }
 }

@@ -4,15 +4,16 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import Loading from "../(other)/Loading";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+const BACKGROUND_COLOR = '#495579';
+
 
 export default function OnGoing(){
     return Home([0,'DESC','recruit','ongoing'])
 } 
 export function Complete(){
     return Home([0,'DESC','recruit','complete'])
-
 }
 
 function Home(recruitForm){
@@ -22,12 +23,10 @@ function Home(recruitForm){
     const[page, setPage] = useState(0);
     const[buttonVisible, setButtonVisible] = useState(true)
     const {getRecruitList} = useHome();
-    
-    useEffect(()=>{
+    const refreshOngoingList = () => { //새로고침 로직
         recruitForm[0] = page
         getRecruitList(recruitForm).then(recruits=>{
             let tmp = null;
-            console.log('page', page)
             if(page === 0){
                 tmp = recruits;
             }
@@ -37,6 +36,9 @@ function Home(recruitForm){
             }
             setRecruitList(tmp)
         })
+    }
+    useEffect(()=>{
+        refreshOngoingList();
     },[page]) 
 
 
@@ -55,9 +57,9 @@ function Home(recruitForm){
 
     return(
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicato={false}>
+            <ScrollView showsVerticalScrollIndicator={false} style={{backgroundColor:BACKGROUND_COLOR}} contentContainerStyle={{backgroundColor:BACKGROUND_COLOR}}>
                 {recruitList ? recruitList.map((item, index)=>{
-                   console.log('item',item)
+                //    console.log('item',item)
                     const date = new Date(item?.modifiedDate);
                     const year = date.getFullYear();
                     const month = date.getMonth() + 1;
@@ -68,7 +70,7 @@ function Home(recruitForm){
                     const dateFormat = `${year}.${newMonth}.${day}  ${hours}:${minutes}`
                     return(
                     //    여기에 onPress로 상세게시글 가야됨 
-                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostDetail', {boardId: item.boardId, title: recruitForm[3]==='ongoing'?'모집 중':'모집 완료'})} >
+                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostDetail', {boardId: item.boardId, title: recruitForm[3]==='ongoing'?'모집 중':'모집 완료', refresh:refreshOngoingList})} >
                     <View style={{ borderRadius: 10, height:hp('22%'), marginBottom:hp('1.5%'), elevation:1,
                     backgroundColor:'white', padding:hp('1.5%'), justifyContent:'space-between'}}>
                         <View>
@@ -126,6 +128,9 @@ const styles = StyleSheet.create({
     container: {
         // flex: 1,
         height:'100%',
+        paddingHorizontal:wp(3),
+        paddingTop:hp(2),
+        backgroundColor:BACKGROUND_COLOR
     },
 
     comment_item_container:{

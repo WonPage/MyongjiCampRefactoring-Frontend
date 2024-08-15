@@ -11,6 +11,7 @@ export default function BoardUpdateModal({navigation, route}){
     const postData = route.params.data;
     const boardId = route.params.boardId;
     const refreshBoardDetail = route.params.callback;
+    const refreshOngoingList = route.params.refresh;
     const [postTitle, setPostTitle] = useState(postData.title);
     const [postContent, setPostContent] = useState(postData.content);
     const [postLocation, setPostLocation] = useState(postData.preferredLocation)
@@ -55,6 +56,7 @@ export default function BoardUpdateModal({navigation, route}){
                 if (!data.isFailed) {
                     navigation.pop();
                     refreshBoardDetail();
+                    refreshOngoingList();
                 }
             })
         }
