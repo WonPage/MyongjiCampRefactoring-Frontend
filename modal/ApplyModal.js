@@ -12,12 +12,13 @@ export default function ApplyModal({navigation, route}){
     const {boardId, role} = route.params;
     const [resumeList, setResumeList] = useState();
     const [selectedResume, setSelectedResume] = useState();
-    const [selectedRole, setSelectedRole] = useState();
+    const [selectedRole, setSelectedRole] = useState(role[0]);
     const {getResumeList} = useResume();
     const {sendApply} = useApply();
 
     useEffect(() => {
         getResumeList().then(resumeList => {
+            console.log(resumeList);
             setResumeList(resumeList);
         })
         const refresh = navigation.addListener('focus', ()=>{getResumeList();});

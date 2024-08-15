@@ -102,7 +102,8 @@ const Apply = ({navigation, route}) => {
                 ) : (
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>                 
                         {receivedResume?.map((resume, index) => {
-                            const dateFormat = getDateFormat(resume.boardCreateDate);
+                            // console.log(resume);
+                            const dateFormat = getDateFormat(resume.boardcreatedDate);
                             return (
                             <View key={index} style={{width:wp('50%'), height:hp('24%'), marginRight:wp('5%'), backgroundColor:'#495579',borderRadius:10, padding:11, justifyContent:'space-between'}}>
                                 <View>

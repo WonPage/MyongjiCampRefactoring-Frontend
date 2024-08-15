@@ -159,6 +159,7 @@ const useUsers = () => {
     const sessionCheck = async(route) => {
         const pageName = route.name;
         const token = JSON.parse(await AsyncStorage.getItem('token'));
+        console.log(token);
         if (pageName==='Login'){
             // 1. 세션이 존재하지 않음
             if (token?.session === undefined) {
@@ -241,9 +242,9 @@ const useUsers = () => {
             }
         }).then(async(res)=>{
             if(res.data.status===200){
-                const newTokenValue = res.data.data.token;
-                const newToken = {...token, token: newTokenValue};
-                AsyncStorage.setItem('token', JSON.stringify(newToken));
+                // const newTokenValue = res.data.data.token;
+                // const newToken = {...token, token: newTokenValue};
+                // AsyncStorage.setItem('token', JSON.stringify(newToken));
                 return true;
             } else {
                 return false;
@@ -262,9 +263,9 @@ const useUsers = () => {
                 
             });
             if(res.data.status===200){
-                const newTokenValue = res.data.data.token;
-                const newToken = {...token, token: newTokenValue};
-                AsyncStorage.setItem('token', JSON.stringify(newToken));
+                // const newTokenValue = res.data.data.token;
+                // const newToken = {...token, token: newTokenValue};
+                // AsyncStorage.setItem('token', JSON.stringify(newToken));
                 return true
             } else {
                 return false
