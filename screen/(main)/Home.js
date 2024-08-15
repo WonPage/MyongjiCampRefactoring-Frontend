@@ -59,7 +59,10 @@ function Home(recruitForm){
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false} style={{backgroundColor:BACKGROUND_COLOR}} contentContainerStyle={{backgroundColor:BACKGROUND_COLOR}}>
                 {recruitList ? recruitList.map((item, index)=>{
+<<<<<<< Updated upstream
                 //    console.log('item',item)
+=======
+>>>>>>> Stashed changes
                     const date = new Date(item?.modifiedDate);
                     const year = date.getFullYear();
                     const month = date.getMonth() + 1;

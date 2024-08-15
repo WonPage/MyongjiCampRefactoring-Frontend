@@ -1,13 +1,92 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect, useRef } from 'react';
+
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { Buffer } from "buffer";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+
 
 const useUsers = () => {
     const navigation = useNavigation();
+    // 알림 설정
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: true
+        })
+      })
+
+      function handleRegistrationError(errorMessage) {
+          alert(errorMessage);
+      }
+      
+      async function registerForPushNotificationsAsync() { // expoToken 받아오기
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+       
+        if (Device.isDevice) {
+          const { status: existingStatus } = ((await Notifications.getPermissionsAsync()));
+          let finalStatus = existingStatus;
+          
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            finalStatus = handleRegistrationError('알림 권한을 어플리케이션 설정에서 다시 설정할 수 있습니다.');
+            return;
+          }
+          const projectId =
+            Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+          if (!projectId) {
+            handleRegistrationError('Project ID not found');
+          }
+          try {
+            const pushTokenString = (
+              await Notifications.getExpoPushTokenAsync({
+                projectId,
+              })
+            ).data;
+            return pushTokenString;
+          } catch (e) {
+            handleRegistrationError(`${e}`);
+          }
+        } else {
+          handleRegistrationError('Must use physical device for push notifications');
+        }
+      }
+      async function sendPushToken(expoToken){ // expo Token 백엔드로 보내기
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const res = await fetch(`${API_URL}/send/expoToken`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({token: expoToken})
+        })
+        if(expoToken!==null){
+            AsyncStorage.setItem('expoToken', JSON.stringify(expoToken));
+        }
+        const result = await res.json()
+      }
     /** 로그인 시도 */
+    const [notification, setNotification] = useState(
+      undefined
+    );
     const tryLogin = (inputData, stayLoggedIn) => {
         axios.post(`${API_URL}/api/login`, inputData, {
             headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
@@ -30,7 +109,20 @@ const useUsers = () => {
                 refreshExp: refreshExp.toISOString()
             }
             AsyncStorage.setItem('token', JSON.stringify(loginData));
-            return navigation.replace('MainNavigation');
+            // console.log(loginData.token)
+            
+            navigation.replace('MainNavigation');
+            registerForPushNotificationsAsync()
+              .then(expoToken => {
+                if(expoToken!==null &&expoToken!==''){
+                    sendPushToken(expoToken)
+                }
+                else{
+                    console.log('useUser expoToken is null ',expoToken)
+                }
+              })
+              .catch((error) => console.log('expoNotificationTokenError in useUser.js',`${error}`));
+            return;
             // return Alert.alert('안내', result.data.message);
         }).catch(err=>{
             // 로그인 실패 중, 서버에서 메세지를 가져왔다면 해당 메세지를, 안가져왔다면 네트워크 오류 메세지
@@ -43,8 +135,15 @@ const useUsers = () => {
     /** 로그아웃 */
     const logout = async() => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        axios.post(`${API_URL}/api/auth/logout`, {}, {
+        const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'));
+        let finalExpoToken = expoToken
+        if(finalExpoToken === null){
+            finalExpoToken = ''
+        }
+
+        axios.post(`${API_URL}/api/auth/logout`, {token: finalExpoToken}, {
             headers:{'Content-Type':'application/json', Authorization: `Bearer ${token.token}`}
+            
         })
         .then(res => {
             AsyncStorage.clear();

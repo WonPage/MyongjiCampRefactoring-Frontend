@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/myongjicamp.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.wonpage.MyongjiCamp"
+      "package": "com.wonpage.MyongjiCamp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
