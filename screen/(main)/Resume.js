@@ -30,7 +30,7 @@ const Resume = ({navigation}) => {
             <FlatList data={resumeList} style={{marginHorizontal: hp('3%')}} contentContainerStyle={styles.resume_item_container}
                 ListFooterComponent={resumeList === null || resumeList?.length>=3 ? ( <></> ) : (<TouchableOpacity style={[styles.resume_add_button, {marginTop: hp('5%'), borderColor:'#495579', borderWidth:2}]} onPress={handleResumeAdd}><Text style={{color:'#495579', fontWeight:500}}>+ 이력서 추가하기</Text></TouchableOpacity>)}
                 ItemSeparatorComponent={<View style={{height:hp('6%')}}></View>}
-                renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createDate} id={item.id} setResumeList={setResumeList}/>} />
+                renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createdDate} id={item.id} setResumeList={setResumeList}/>} />
             </View>
         </View>
     )

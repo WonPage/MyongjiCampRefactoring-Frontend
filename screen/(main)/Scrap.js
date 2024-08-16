@@ -61,6 +61,7 @@ const Scrap = ({navigation, route}) => {
                 const newMonth = month.toString().padStart(2, '0');
                 const day = date.getDate().toString().padStart(2, '0');
                 const dateFormat = `${year}.${newMonth}.${day}`   
+                console.log(item);
                 return (
                   <TouchableOpacity activeOpacity={0.4} key={index} onPress={()=>navigation.navigate('PostDetail', {
                     title:(statusMode==='RECRUIT_ONGOING'?'모집 중':

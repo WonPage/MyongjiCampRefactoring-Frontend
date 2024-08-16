@@ -87,16 +87,17 @@ export default function useSignup(){
         const data = axios.post(`${API_URL}/api/members`, userData, { headers: { 'Content-Type': 'application/json'}})
         .then(res => {
             if (res.data.status === 200){
-                Alert.alert('안내', res.data.data);
+                Alert.alert('안내', '회원가입에 성공했습니다.');
                 return {isFailed:false};
             } else {
-                Alert.alert('경고', res.data.data);
+                Alert.alert('경고', '회원가입에 실패했습니다.');
                 return {isFailed:true};
             }
         })
         .catch(error => {
-            const result = error.response.data;
-            Alert.alert('경고', result.data);
+            Alert.alert('경고', '회원가입에 실패했습니다.');
+            // const result = error.response.data;
+            // Alert.alert('경고', result.data);
             return {isFailed:true};
         })
         return data;

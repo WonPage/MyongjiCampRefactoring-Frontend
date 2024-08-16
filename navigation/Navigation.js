@@ -38,6 +38,15 @@ import ReportModal from "../modal/ReportModal";
 import ApplyMenuModal from "../modal/ApplyMenuModal";
 import RecruitCompleteCheckModal from "../modal/RecruitCompleteCheckModal";
 import ApplyModal from "../modal/ApplyModal";
+import SentResumeModal from "../modal/SentResumeModal";
+import ReceivedResumeModal from "../modal/ReceivedResumeModal";
+import ReceivedResumeDetailModal from "../modal/ReceivedResumeDetailModal";
+import ApplyProcessModal from "../modal/ApplyProcessModal";
+import PrevReceivedResumeModal from "../modal/PrevReceivedResumeModal";
+import ApplyFinalProcessModal from "../modal/ApplyFinalProcessModal";
+import PostComplete from "../screen/(main)/PostComplete";
+import PostCompleteDetail from "../screen/(main)/PostCompleteDetail";
+import CompleteBoardUpdateModal from "../modal/CompleteBoardUpdateModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -75,7 +84,13 @@ const Navigation = () => {
                 options={option=>({title:option.route.params.title, headerTitleAlign:'center'})} />
                 <Stack.Screen name="Resume" component={Resume}
                 options={{title: '이력서', headerTitleAlign: 'center', headerTitleStyle:{fontSize: 28}}}  />
-
+                <Stack.Screen name="PostComplete" component={PostComplete}
+                options={{headerTitle:'개발 완료 글 작성',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
+                <Stack.Screen name="PostCompleteDetail" component={PostCompleteDetail}
+                options={option=>({title:"개발 완료", headerTitleAlign:'center'})} />
+                <Stack.Screen name="CompleteBoardUpdateModal" component={CompleteBoardUpdateModal}
+                options={{headerTitle:'개발 완료 글 수정',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
+                
                 {/* Other Page */}
                 <Stack.Screen name="Event" component={Event}/>
                 <Stack.Screen name="FAQ" component={FAQ}/>
@@ -99,6 +114,12 @@ const Navigation = () => {
                     <Stack.Screen name="ApplyMenuModal" component={ApplyMenuModal} />
                     <Stack.Screen name="RecruitCompleteCheckModal" component={RecruitCompleteCheckModal} />
                     <Stack.Screen name="ApplyModal" component={ApplyModal} />
+                    <Stack.Screen name="SentResumeModal" component={SentResumeModal} />
+                    <Stack.Screen name="ReceivedResumeModal" component={ReceivedResumeModal} />
+                    <Stack.Screen name="ReceivedResumeDetailModal" component={ReceivedResumeDetailModal} />
+                    <Stack.Screen name="PrevReceivedResumeModal" component={PrevReceivedResumeModal} />
+                    <Stack.Screen name="ApplyProcessModal" component={ApplyProcessModal} />
+                    <Stack.Screen name="ApplyFinalProcessModal" component={ApplyFinalProcessModal} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
@@ -117,15 +138,15 @@ const MainNavigation = ({navigation}) => {
             tabBarStyle:{ height: hp('8.5%'), paddingTop:hp('0.5%'), paddingBottom:hp('1%')},
         }}>
             <Tab.Screen name="Home" component={HomeNavigation}
-            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
+            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
             headerTitle: '명지캠프'}}/>
             <Tab.Screen name="Scrap" component={Scrap}
-            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
+            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
             <Tab.Screen name="PostButton" component={PostButton}
             options={{ title: '글쓰기', tabBarIcon: ({color, size}) => <AntDesign name="pluscircle" size={34} color={'#003366'} />,
             tabBarButton: (props) => (<TouchableOpacity activeOpacity={0.7} {...props} onPress={()=>{navigation.push('Post');}}/>), tabBarLabelStyle: {display: 'none'}}}/>
             <Tab.Screen name="Apply" component={Apply}
-            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
+            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
             <Tab.Screen name="MyPage" component={MyPage}
             options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '마이페이지', tabBarIcon: ({color, size}) => <Octicons name="person" size={24} color={color} />}}/>
         </Tab.Navigator>

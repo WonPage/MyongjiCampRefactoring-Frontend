@@ -13,6 +13,7 @@ export default function useApply() {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
         const result = axios.get(`${API_URL}/api/auth/apply/applicant`, {
             headers: {
+
                 Authorization: `Bearer ${token.token}`
             },
         })
@@ -57,20 +58,56 @@ export default function useApply() {
             })
         return result;
     }
-    async function resumeProcess(type, resumeId) {
+    async function resumeProcess(resumeId, firstStatus, resultContent, resultUrl = undefined) {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        if (type === 'Accept') {
-
+        const inputData = {
+            firstStatus: firstStatus,
+            resultContent: resultContent,
+            resultUrl: resultUrl 
         }
-        const result = axios.put(`${API_URL}/api/auth/apply/first/${resumeId}`, {}, {
+        const result = axios.put(`${API_URL}/api/auth/apply/first/${resumeId}`, inputData, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token.token}`
             },
         })
-            .then(res => {
-                return res.data;
-            })
+        .then(res => {
+            if (res.data.status === 200) {
+                Alert.alert(res.data.data);
+                navigation.replace('MainNavigation');
+            } else {
+                Alert.alert("처리에 실패했습니다.");
+            }
+        })
+        .catch(err => {
+            Alert.alert("처리에 실패했습니다.");
+        })
+        return result;
+    }
+    async function resumeFinalProcess(resumeId, finalStatus) {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const inputData = {
+            finalStatus: finalStatus
+        }
+        const result = axios.put(`${API_URL}/api/auth/apply/final/${resumeId}`, inputData, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token.token}`
+            },
+        })
+        .then(res => {
+            if (res.data.status === 200) {
+                console.log(res.data);
+                Alert.alert(res.data.data);
+                navigation.replace('MainNavigation');
+            } else {
+                Alert.alert(res.data.data);
+                // console.log(res.data.data);
+            }
+        })
+        .catch(err => {
+            Alert.alert("처리에 실패했습니다.");
+        })
         return result;
     }
     async function cancleApply(applyId) {
@@ -82,7 +119,7 @@ export default function useApply() {
             if (res.data.status === 200) {
                 Alert.alert("지원이 취소었습니다.");
             } else {
-                Alert.alert("지원 취소를 실패했습니다.");
+                Alert.alert("안내", res.data.data);
             }
         })
         .catch(err => {
@@ -102,7 +139,7 @@ export default function useApply() {
             status: "RECRUIT_COMPLETE",
             preferredLocation: boardData.preferredLocation,
             expectedDuration: boardData.expectedDuration,
-            roleAssignments: boardDataList
+            roleAssignments: boardData.roleAssignments
         }
         const data = axios.put(`${API_URL}/api/auth/recruit/${boardId}`, putData, {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}` }
@@ -125,9 +162,11 @@ export default function useApply() {
     }
 
     /** 지원 보내기 */
-    const sendApply = async(boardId, resumeId, selectedRole) => {
+    const sendApply = async(boardId, resume, selectedRole) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        axios.get(`${API_URL}/api/auth/resume/${resumeId}`)
+        axios.get(`${API_URL}/api/auth/resume/${resume.id}`, {
+            headers:{"Content-Type":'application/json', Authorization: `Bearer ${token.token}`}
+        })
         .then(res => {
             const content = res.data.data.content;
             const url = res.data.data.url;
@@ -147,6 +186,6 @@ export default function useApply() {
     }
 
     return { getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, resumeProcess, cancleApply, completeRecruit,
-        sendApply
+        sendApply, resumeFinalProcess
      }
 }

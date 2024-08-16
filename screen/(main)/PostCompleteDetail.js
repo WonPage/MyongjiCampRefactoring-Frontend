@@ -1,37 +1,45 @@
 /** 담당자 채윤 
- * 240622 - 글 상세보기 UI, 조회 기능 구현 완료, 댓글 조회 및 작성, 삭제 기능 구현 */
+ * 240816 - 개발완료 상세보기 */
 import { useEffect, useRef, useState } from "react";
 import useBoard from "../../hook/useBoard";
 import useUsers from "../../hook/useUsers";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Image, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
 import useComment from "../../hook/useComment";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const PostDetail = ({navigation, route}) => {
-    const scrollViewRef = useRef();
-    const boxRef = useRef();
+export default function PostCompleteDetail({route}){
     const {boardId, refresh} = route.params;
     const {sessionCheck} = useUsers();
-    const {getBoardDetail, checkScrap, scrap} = useBoard();
+    const {getCompleteBoardDetail, checkScrap} = useBoard();
     const {getComment} = useComment();
-    const [userId, setUserId] = useState();
-    const [postData, setPostData] = useState();
-    const [isScrap, setIsScrap] = useState();
-    const [commentList, setCommentList] = useState([]);
+
+    const boxRef = useRef();
+    const scrollViewRef = useRef();
     const [replyMode, setReplyMode] = useState(false);
     const [replyId, setReplyId] = useState();
     const [replyNickname, setReplyNickname] = useState();
+    const [postData, setPostData] = useState();
+    const [userId, setUserId] = useState();
+    const [isScrap, setIsScrap] = useState();
+    const [commentList, setCommentList] = useState([]);
+
     useFocusEffect(()=>{
         sessionCheck(route);
         // refreshComment();
     })
+    useEffect(()=>{
+        refreshBoardDetail();
+        refreshComment();
+    },[])
     const refreshBoardDetail = () => {
-        getBoardDetail(boardId).then(data=>{
-            if (!data.isFailed) {
+        getCompleteBoardDetail(boardId).then(data=>{
+            if (!data.isFailed){
+                console.log(data.postData);
                 setUserId(data.userId);
                 setPostData(data.postData);
                 checkScrap(boardId).then(data=>{
@@ -45,56 +53,12 @@ const PostDetail = ({navigation, route}) => {
     const refreshComment = () => {
         getComment(boardId).then(data=>{
             if (!data.isFailed){
-                data.commentList.map((value, index)=>{
-                    // console.log(index, ':', value);
-                })
                 setCommentList(data.commentList)
             }
         })
     }
-    useEffect(()=>{
-        refreshBoardDetail();
-        refreshComment();
-    },[])
-    const iconPath = {
-        1 : require('../../assets/profile-icon/ai.jpg'),
-        2 : require('../../assets/profile-icon/cloud.jpg'),
-        3 : require('../../assets/profile-icon/design.jpg'),
-        4 : require('../../assets/profile-icon/dog.jpg'),
-        5 : require('../../assets/profile-icon/rabbit.jpg')
-    }
-    const date = new Date(postData?.modifiedDate);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const newMonth = month.toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const dateFormat = `${year}.${newMonth}.${day} ${hours}:${minutes}`
 
-    const handleDevelopComplete = () => {
-        console.log("개발완료 :",boardId)
-    }
-
-    const handleRecruitComplete = () => {
-        navigation.navigate('RecruitCompleteCheckModal', {boardId:boardId, boardData:postData});
-    }
-    const handleApply = () => {
-        //Modal로 구현 예정
-        navigation.navigate('ApplyModal', {boardId:boardId, role:postData.roleAssignments});
-    }
-    const handleBoardShare = () => {
-        //카카오톡으로 공유하기 구현 예정
-    }
-    const handleScrap = () => {
-        scrap(boardId).then(data=>{
-            if (!data.isFailed) {
-                refreshBoardDetail();
-            }
-        })
-    }
-
-    // 댓글 (Comment) Part
+    // 대댓글 모드
     const handleReply = (commentId, commentUserNickname) => {
         setReplyMode(true);
         setReplyId(commentId);
@@ -113,114 +77,119 @@ const PostDetail = ({navigation, route}) => {
         }
     }
     return(
-        <View>
-           <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps={'handled'} style={{marginBottom:hp('9%')}} contentContainerStyle={{backgroundColor: 'white'}} showsVerticalScrollIndicator={false} >
+        <View style={{backgroundColor:'white', paddingHorizontal:wp(5)}}>
+            {postData&&userId ? 
+            <ScrollView showsVerticalScrollIndicator={false} ref={scrollViewRef} contentContainerStyle={{paddingTop:hp(4)}} style={{ marginBottom:hp('9%')}}>
                 <Pressable onPress={handleReplyModeCancle}>
-                <View style={postData? {marginHorizontal: wp('5%'), marginTop: hp('4%')} : {height:hp('80%')}}>
-                {postData ? (
-                <View>
-                    <View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-                        <View style={{flexDirection: 'row', alignItems:'center'}} >
-                            <Image source={iconPath[postData.profileIcon]} style={{marginRight:wp('3%'), borderRadius:100, height:hp('4%'), width:wp('8%')}}/>
-                            <Text style={{marginRight:wp('2%'), marginBottom:hp('0.5%')}}>{postData.nickname}</Text>
-                            <Text style={{fontSize:12, color:'gray'}}>{ postData.modifiedDate === postData.createDate ? dateFormat : `${dateFormat} (수정됨)`}</Text>
-                        </View>
-                        <View style={{flexDirection: 'row', alignItems:'center'}}>
-                            { postData.writerId === userId ? (<>
-                                <TouchableOpacity onPress={()=>{
-                                    // 본인 글
-                                    navigation.navigate('BoardUpdateModal', {data: postData, boardId:boardId, callback:refreshBoardDetail, refresh:refresh})
-                                }}>
-                                    <Text>수정</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={()=>{
-                                    navigation.navigate("BoardDeleteModal", {boardId:boardId});
-                                }}>
-                                    <Text style={{marginLeft:hp('1.5%')}}>삭제</Text>
-                                </TouchableOpacity>
-                            </>) : (
-                                <TouchableOpacity onPress={()=>{
-                                    // 다른 사용자 글
-                                    navigation.navigate('ReportModal', {boardId: boardId, type: 'Post'});
-                                }}>
-                                    <Text>신고</Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
-                    <View>
-                        <Text style={{fontSize:23, marginTop: hp('2%')}}>{postData.title}</Text>
-                    </View>
-                    <View style={{marginTop:hp('1%'), minHeight:hp('15%')}}>
-                        <Text>{postData.content}</Text>
-                    </View>
-                    <View style={{borderWidth:1, borderRadius:15, marginTop:hp('1%'), marginBottom:hp('4%'), padding:wp('5%')}}>
-                        <View style={{marginBottom: hp('2%'), flexDirection:'row', alignItems:'baseline', justifyContent:'space-between'}}>
-                            <Text style={{fontSize:16, fontWeight:'500'}}>선호 지역</Text>
-                            <Text>{postData.preferredLocation}</Text>
-                        </View>
-                        <View style={{flexDirection:'row', alignItems:'baseline', justifyContent:'space-between'}}>
-                            <Text style={{fontSize:16, fontWeight:'500'}}>예상 기간</Text>
-                            <Text>{postData.expectedDuration}</Text>
-                        </View>
-                    </View>
-                    <View style={{backgroundColor:'#495579', borderRadius:15, paddingHorizontal:wp('5%'), paddingVertical:hp('0.5%')}}>
-                        {postData.roleAssignments.map((role, index) => (
-                            <View key={index} style={{flexDirection:'row', justifyContent: 'space-between', paddingVertical:hp('2%')}}>
-                                <Text style={{color:'white'}}>{
-                                role.role === 'BACK' ? ('백엔드') :
-                                role.role === 'FRONT' ? ('프론트엔드') :
-                                role.role === 'DESIGN' ? ('디자인') :
-                                role.role === 'FULL' ? ('풀스택') :
-                                role.role === 'PM' ? ('기획') :
-                                (role.role)}</Text>
-                                <View style={{flexDirection:'row'}}>
-                                    <Text style={{color:'white'}}>{role.appliedNumber}</Text>
-                                    <Text style={{color:'white'}}>/</Text>
-                                    <Text style={{color:'white'}}>{role.requiredNumber}</Text>
-                                </View>
-                            </View>
-                        ))}
-                    </View>
-                    <View style={{justifyContent:'center', alignItems:'center'}}>
-                        {postData.status=="RECRUIT_ONGOING" ? (
-                            <TouchableOpacity onPress={postData.writerId === userId ? handleRecruitComplete : handleApply}
-                                activeOpacity={0.7} style={{ marginTop: hp('6%'), backgroundColor: '#263159', width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? ('모집 마감하기') : ('지원하기')}</Text>
-                            </TouchableOpacity>
-                        ) : postData.status=="RECRUIT_COMPLETE" ? (
-                            <TouchableOpacity onPress={postData.writerId === userId ? handleDevelopComplete : undefined}
-                                activeOpacity={0.7} style={[postData.writerId === userId?{backgroundColor: '#263159'}:{backgroundColor: 'lightgray'}, { marginTop: hp('6%'), width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center' }]}>
-                                    <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? ('개발 완료하기') : ('지원 마감')}</Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <></>
-                        )}
-                    </View>
-                    <View style={{flexDirection:'row', justifyContent:'flex-end', marginTop:hp('4%'), marginBottom:hp('1.5%'), marginRight:wp('2%')}}>
-{/*                         <TouchableOpacity activeOpacity={0.6} onPress={handleBoardShare} >
-                            <Entypo name="share" size={29} color="gray" />
-                        </TouchableOpacity> */}
-                        <TouchableOpacity activeOpacity={0.6} onPress={handleScrap} style={{marginLeft:'5%'}} >
-                            <FontAwesome name="bookmark-o" size={29} color={isScrap ? '#ffca1a' : 'gray'}  />
-                        </TouchableOpacity>
-                    </View>
-                </View>) : <Loading/> }
-                </View>
-
-                <Comment navigation={navigation} commentList={commentList} iconPath={iconPath} userId={userId} writerId={postData?.writerId} boardId={boardId}
-                refreshComment={refreshComment} handleReply={handleReply}/>
+                    <BoardData postData={postData} userId={userId} boardId={boardId} refreshBoardDetail={refreshBoardDetail} isScrap={isScrap} refresh={refresh}/>
+                    <Comment commentList={commentList} userId={userId} writerId={postData.writerId} boardId={boardId} refreshComment={refreshComment} handleReply={handleReply}/>
                 </Pressable>
             </ScrollView>
-            <CommentPush boardId={boardId} scrollViewRef={scrollViewRef} refreshComment={refreshComment} boxRef={boxRef} replyMode={replyMode} replyId={replyId} setReplyMode={setReplyMode} setReplyId={setReplyId} replyNickname={replyNickname} setReplyNickname={setReplyNickname}/>
+            : <Loading/>}
+            <CommentPush boardId={boardId} scrollViewRef={scrollViewRef} refreshComment={refreshComment} boxRef={boxRef} replyMode={replyMode} replyId={replyId} setReplyMode={setReplyMode} setReplyId={setReplyId} replyNickname={replyNickname} setReplyNickname={setReplyNickname} />
         </View>
     )
 }
 
-function Comment({navigation, commentList, iconPath, userId, writerId, boardId, refreshComment, handleReply}) {
+function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap, refresh}){
+    const navigation = useNavigation();
+    const {scrap} = useBoard();
+    const iconPath = {
+        1 : require('../../assets/profile-icon/ai.jpg'),
+        2 : require('../../assets/profile-icon/cloud.jpg'),
+        3 : require('../../assets/profile-icon/design.jpg'),
+        4 : require('../../assets/profile-icon/dog.jpg'),
+        5 : require('../../assets/profile-icon/rabbit.jpg')
+    }
+    const date = new Date(postData.createdDate);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const newMonth = month.toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const dateFormat = `${year}.${newMonth}.${day} ${hours}:${minutes}`
     return (
-        <View style={ commentList ? {borderTopWidth: 2, marginHorizontal: wp('6%'), paddingVertical:hp('1%')} : {borderTopWidth: 2, marginHorizontal: wp('6%')}}>
-        {commentList.length > 0 ? commentList.map((comment) => {
+        <>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                <Image source={iconPath[postData.profileIcon]} style={{ marginRight: wp('3%'), borderRadius: 100, height: hp('4%'), width: wp('8%') }} />
+                <Text style={{ marginRight: wp('2%'), marginBottom: hp('0.5%') }}>{postData.nickname}</Text>
+                <Text style={{ fontSize: 12, color: 'gray' }}>{postData.modifiedDate === postData.createDate ? dateFormat : `${dateFormat} (수정됨)`}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {postData.writerId === userId ? (<>
+                    <TouchableOpacity onPress={() => {
+                        // 본인 글
+                        navigation.navigate('CompleteBoardUpdateModal', { data: postData, boardId: boardId, callback: refreshBoardDetail, refresh: refresh })
+                    }}>
+                        <Text>수정</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate("BoardDeleteModal", { boardId: boardId, type:'Complete'});
+                    }}>
+                        <Text style={{ marginLeft: hp('1.5%') }}>삭제</Text>
+                    </TouchableOpacity>
+                </>) : (
+                    <TouchableOpacity onPress={() => {
+                        // 다른 사용자 글
+                        navigation.navigate('ReportModal', { boardId: boardId, type: 'Post' });
+                    }}>
+                        <Text>신고</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </View>
+        <View>
+            <View>
+                {/* <Text style={{marginTop: hp('2%'), marginLeft:wp(1)}}>제목</Text> */}
+                <Text style={{fontSize:27, marginTop:hp(2)}}>{postData.title}</Text>
+            </View>
+            {/* <Text style={{marginTop: hp('2%'), marginLeft:wp(1)}}>내용</Text> */}
+            {/* <View style={{marginTop:hp(1), minHeight:hp('20%'), borderWidth:1, borderRadius:wp(3), padding:wp(3)}}> */}
+                <Text style={{marginTop:hp(2)}}>{postData.content}</Text>
+            {/* </View> */}
+            <View style={{ alignItems:'center'}}>
+                {postData.imageUrls.map((image, index)=>{
+                    return (
+                        <View key={index} style={{padding:wp(5)}}>
+                            <Image source={{uri:image}} style={{width:wp(85), height:wp(85), borderRadius:wp(1)}}/>
+                        </View>
+                    )
+                })}
+            </View>
+            <View style={{marginTop:hp(2), marginBottom:hp(3), alignItems:'center'}}>
+                <TouchableOpacity activeOpacity={0.6} onPress={()=>{
+                    scrap(boardId).then(data=>{
+                        if (!data.isFailed) {
+                            refreshBoardDetail();
+                        }
+                    })
+                }} style={{backgroundColor: isScrap ? '#ffcc0055' : 'lightgray', width:wp(25), height:wp(25), justifyContent:'center', alignItems:'center', borderRadius:100}} >
+                    <FontAwesome name="bookmark" size={wp(12)} color={isScrap ? '#ffca1a' : 'gray'}  />
+                </TouchableOpacity>
+            </View>
+        </View>
+        </>
+    )
+}
+
+function Comment({commentList, userId, writerId, boardId, refreshComment, handleReply}) {
+    const navigation = useNavigation();
+    const iconPath = {
+        1 : require('../../assets/profile-icon/ai.jpg'),
+        2 : require('../../assets/profile-icon/cloud.jpg'),
+        3 : require('../../assets/profile-icon/design.jpg'),
+        4 : require('../../assets/profile-icon/dog.jpg'),
+        5 : require('../../assets/profile-icon/rabbit.jpg')
+    }
+    return (
+        <View style={{borderTopWidth: 2, paddingVertical:hp('1%')}}>
+        {commentList.length === 0 ?
+        <View style={{ marginVertical: hp('1%'), justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 15, height: hp('10%') }}>
+            <Text style={{ fontSize: 16, color: 'gray' }}>댓글이 존재하지 않습니다.</Text>
+        </View> :
+        commentList.map((comment) => {
             const date = new Date(comment.commentCreateDate);
             const currentDate = new Date();
             const diffTime = Math.abs(currentDate - date);
@@ -232,10 +201,13 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const longFormat = `${year}.${month}.${day}`
             const nowFormat = `${hours}:${minutes}`
+    console.log(comment);
             return (
                 <View key={comment.id}>
                     <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>
+                    {comment.delete===false ? (
+                        <>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>                            
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Image source={iconPath[comment.profileIcon]} style={{ borderRadius: 50, width: wp('7%'), height: hp('3.5%'), marginRight: wp('2%') }} />
                                 <Text style={{ marginRight: wp('3%'), fontWeight: '500' }}>{comment.nickname}</Text>
@@ -275,6 +247,12 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                         ) : (
                             <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
                         )}
+                        </>
+                    ) : (
+                        <View style={{alignItems: 'center', backgroundColor:'#F0F1F2', height:hp(9), justifyContent:'center', alignItems:'center', borderRadius:wp(5) }}>
+                            <Text>삭제된 댓글입니다.</Text>
+                        </View>
+                    )}
                     </View>
                     {comment.children.map((comm) => (
                         <View key={comm.id} style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: hp('1%'), }}>
@@ -314,12 +292,8 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                         </View>
                     )) }
                 </View>
-            )}) : (
-            <View style={{ marginVertical: hp('1%'), justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 15, height: hp('10%') }}>
-                <Text style={{ fontSize: 16, color: 'gray' }}>댓글이 존재하지 않습니다.</Text>
-            </View>
-            )}
-    </View>
+            )})}
+        </View>
     )
 }
 
@@ -384,4 +358,3 @@ const styles = StyleSheet.create({
         flexDirection:'row',width:wp('100%'), height:hp('9%')
     },
 })
-export default PostDetail;
