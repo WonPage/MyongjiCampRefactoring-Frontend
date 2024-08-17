@@ -203,11 +203,15 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const longFormat = `${year}.${month}.${day}`
             const nowFormat = `${hours}:${minutes}`
-            console.log(comment);
+            // console.log(comment);
             return (
                 <View key={comment.id}>
                     <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
-                    {comment.delete===false ? (
+                    {comment.delete===true ? (
+                        <View style={{alignItems: 'center', backgroundColor:'#F0F1F2', height:hp(9), justifyContent:'center', alignItems:'center', borderRadius:wp(5) }}>
+                            <Text>삭제된 댓글입니다.</Text>
+                        </View>
+                        ) : (
                         <>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>                            
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -250,10 +254,6 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
                             <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
                         )}
                         </>
-                    ) : (
-                        <View style={{alignItems: 'center', backgroundColor:'#F0F1F2', height:hp(9), justifyContent:'center', alignItems:'center', borderRadius:wp(5) }}>
-                            <Text>삭제된 댓글입니다.</Text>
-                        </View>
                     )}
                     </View>
                     {comment.children.map((comm) => (

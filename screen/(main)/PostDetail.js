@@ -237,7 +237,13 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
             return (
                 <View key={comment.id}>
                     <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>
+                    {comment.delete===true ? (
+                        <View style={{alignItems: 'center', backgroundColor:'#F0F1F2', height:hp(9), justifyContent:'center', alignItems:'center', borderRadius:wp(5) }}>
+                            <Text>삭제된 댓글입니다.</Text>
+                        </View>
+                        ) : (
+                        <>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: wp('2%'), marginRight: wp('3%'), marginTop: hp('0.5%') }}>                            
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Image source={iconPath[comment.profileIcon]} style={{ borderRadius: 50, width: wp('7%'), height: hp('3.5%'), marginRight: wp('2%') }} />
                                 <Text style={{ marginRight: wp('3%'), fontWeight: '500' }}>{comment.nickname}</Text>
@@ -248,7 +254,7 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
                                         <Text style={{ fontSize: 13 }}>댓글</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id})}>
+                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id, callback:refreshComment})}>
                                         <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
                                     </TouchableOpacity></>) : writerId === userId ? (<>
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
@@ -277,6 +283,8 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                         ) : (
                             <Text style={{ margin: hp('1%'), color: "#BBBBBB" }}>비밀 댓글입니다.</Text>
                         )}
+                        </>
+                    )}
                     </View>
                     {comment.children.map((comm) => (
                         <View key={comm.id} style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: hp('1%'), }}>
