@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import useBoard from "../../hook/useBoard";
 import useUsers from "../../hook/useUsers";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
 import { Image, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -13,7 +13,7 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function PostCompleteDetail({route}){
-    const {boardId, refresh} = route.params;
+    const {boardId} = route.params;
     const {sessionCheck} = useUsers();
     const {getCompleteBoardDetail, checkScrap} = useBoard();
     const {getComment} = useComment();
@@ -30,16 +30,18 @@ export default function PostCompleteDetail({route}){
 
     useFocusEffect(()=>{
         sessionCheck(route);
-        // refreshComment();
     })
+    const isFocused = useIsFocused();
     useEffect(()=>{
-        refreshBoardDetail();
-        refreshComment();
-    },[])
+        if (isFocused){
+            refreshBoardDetail();
+            refreshComment();
+        }
+    },[isFocused])
     const refreshBoardDetail = () => {
         getCompleteBoardDetail(boardId).then(data=>{
             if (!data.isFailed){
-                console.log(data.postData);
+                // console.log(data.postData);
                 setUserId(data.userId);
                 setPostData(data.postData);
                 checkScrap(boardId).then(data=>{
@@ -81,7 +83,7 @@ export default function PostCompleteDetail({route}){
             {postData&&userId ? 
             <ScrollView showsVerticalScrollIndicator={false} ref={scrollViewRef} contentContainerStyle={{paddingTop:hp(4)}} style={{ marginBottom:hp('9%')}}>
                 <Pressable onPress={handleReplyModeCancle}>
-                    <BoardData postData={postData} userId={userId} boardId={boardId} refreshBoardDetail={refreshBoardDetail} isScrap={isScrap} refresh={refresh}/>
+                    <BoardData postData={postData} userId={userId} boardId={boardId} refreshBoardDetail={refreshBoardDetail} isScrap={isScrap}/>
                     <Comment commentList={commentList} userId={userId} writerId={postData.writerId} boardId={boardId} refreshComment={refreshComment} handleReply={handleReply}/>
                 </Pressable>
             </ScrollView>
@@ -91,7 +93,7 @@ export default function PostCompleteDetail({route}){
     )
 }
 
-function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap, refresh}){
+function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap}){
     const navigation = useNavigation();
     const {scrap} = useBoard();
     const iconPath = {
@@ -121,7 +123,7 @@ function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap, refr
                 {postData.writerId === userId ? (<>
                     <TouchableOpacity onPress={() => {
                         // 본인 글
-                        navigation.navigate('CompleteBoardUpdateModal', { data: postData, boardId: boardId, callback: refreshBoardDetail, refresh: refresh })
+                        navigation.navigate('CompleteBoardUpdateModal', { data: postData, boardId: boardId})
                     }}>
                         <Text>수정</Text>
                     </TouchableOpacity>
@@ -201,7 +203,7 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const longFormat = `${year}.${month}.${day}`
             const nowFormat = `${hours}:${minutes}`
-    console.log(comment);
+            console.log(comment);
             return (
                 <View key={comment.id}>
                     <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
@@ -323,9 +325,9 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
         <>
         {replyMode ? (
                 <View style={[styles.comment_push_container]}>
-                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('5%'), height: hp('2.5%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:hp('3%') }}
+                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('4%'), height: wp('4%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:wp('6%') }}
                         isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} fillColor="#495579"/>
-                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray', textAlignVertical:'center', marginLeft:wp('-3%'), marginRight:wp('2%')}}>비밀</Text>
+                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray', textAlignVertical:'center', marginLeft:wp('-4%'), marginRight:wp('2%'), fontSize:12}}>비밀</Text>
                     <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
                         value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
                     <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
@@ -335,10 +337,10 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
                 </View>
             ) : (
                 <View style={[styles.comment_push_container]}>
-                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('5%'), height: hp('2.5%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:hp('3%') }}
+                    <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp(4), height: wp(4) }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:wp(6) }}
                         isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} fillColor="#495579"/>
-                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray' ,textAlignVertical:'center', marginLeft:wp('-3%'), marginRight:wp('2%')}}>비밀</Text>
-                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
+                    <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray' ,textAlignVertical:'center', marginLeft:wp('-4%'), marginRight:wp('2%'), fontSize:12}}>비밀</Text>
+                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp(56), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
                         value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
                     <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
                         style={{ width: wp('13%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
@@ -351,10 +353,10 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
 }
 const styles = StyleSheet.create({
     comment_push_container: {
-        paddingVertical:hp('0.7%'),
+        paddingVertical:hp('1.1%'), marginLeft:wp(3), marginRight:wp(3),
         borderWidth:2, borderColor:'gray', borderRadius: wp('5%'),
         paddingHorizontal:wp('3%'), backgroundColor:'white',
         position: 'absolute', bottom:0, justifyContent:'space-between',
-        flexDirection:'row',width:wp('100%'), height:hp('9%')
+        flexDirection:'row', height:hp('9%')
     },
 })

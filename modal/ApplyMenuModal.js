@@ -6,13 +6,13 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 import useApply from "../hook/useApply";
 
 export default function ApplyMenuModal({navigation, route}){
-    const {boardId, callback} = route.params;
+    const {boardId} = route.params;
     const {cancleApply} = useApply();
     const handleMoveToBoard = () => {
         navigation.navigate("PostDetail", {boardId:boardId, title:"지원한 게시글"});
     }
     const handleCancleApply = () => {
-        cancleApply(boardId).then(callback);
+        cancleApply(boardId);
     }
     return(
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

@@ -4,6 +4,7 @@ import useHome from "../../hook/useHome";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 const BACKGROUND_COLOR = '#495579';
 
 export default function Finish({navigation}){
@@ -25,10 +26,14 @@ export default function Finish({navigation}){
             setFinishList(tmp)
         })
     }
+
+    const isFocused = useIsFocused();
     useEffect(()=>{
-        refreshFinishList();
-        console.log(finishList);
-    },[page]) 
+        if (isFocused){
+            refreshFinishList();
+            // console.log(finishList);
+        }
+    },[isFocused, page]) 
 
     const handleMoreButton = () => {
         getRecruitList([page+1,'DESC','complete',null]).then(completes=>{
@@ -54,7 +59,7 @@ export default function Finish({navigation}){
                     const minutes = date.getMinutes().toString().padStart(2,'0');
                     const dateFormat = `${year}.${newMonth}.${day}  ${hours}:${minutes}`
                     return(
-                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostCompleteDetail', {boardId: item.boardId, refresh:refreshFinishList})} >
+                    <TouchableOpacity activeOpacity={0.5} key={index} onPress={()=>navigation.navigate('PostCompleteDetail', {boardId: item.boardId})} >
                     <View style={{ borderRadius: 5, height:hp('22%'), marginBottom:hp('1.5%'), elevation:1,
                     backgroundColor:'white', padding:hp(1.5), flexDirection:'row'}}>
                         <View style={{marginRight:wp(3)}}>

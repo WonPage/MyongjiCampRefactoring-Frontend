@@ -6,7 +6,7 @@ import useComment from "../hook/useComment";
 
 export default function CommentDeleteModal({navigation, route}){
     const {deleteComment} = useComment();
-    const {boardId, commentId, callback} = route.params;
+    const {boardId, commentId} = route.params;
     return(
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0, 0, 0, 0.3)' }]} onPress={navigation.goBack} />
@@ -21,7 +21,6 @@ export default function CommentDeleteModal({navigation, route}){
                         deleteComment(boardId, commentId).then(data=>{
                             if (!data.isFailed) {
                                 navigation.goBack();
-                                callback();
                             }
                         })
                     }

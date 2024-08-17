@@ -6,8 +6,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-nati
 import * as ImagePicker from 'expo-image-picker'
 
 export default function CompleteBoardUpdateModal({navigation, route}){
-    const {boardId, data, callback, refresh} = route.params;
-    console.log(data);
+    const {boardId, data} = route.params;
 
     const [postTitle, setPostTitle] = useState(data.title);
     const [postContent, setPostContent] = useState(data.content);
@@ -40,8 +39,6 @@ export default function CompleteBoardUpdateModal({navigation, route}){
         updateCompleteBoard(updateData).then(data=>{
             if (!data.isFailed) {
                 navigation.pop();
-                callback();
-                refresh();
             } 
         })
     }

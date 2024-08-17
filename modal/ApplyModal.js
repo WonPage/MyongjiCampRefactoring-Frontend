@@ -7,6 +7,7 @@ import { Alert, Pressable, StyleSheet, Text, TouchableOpacity, View } from "reac
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import useResume from "../hook/useResume";
 import useApply from "../hook/useApply";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function ApplyModal({navigation, route}){
     const {boardId, role} = route.params;
@@ -16,16 +17,17 @@ export default function ApplyModal({navigation, route}){
     const {getResumeList} = useResume();
     const {sendApply} = useApply();
 
+    const isFocused = useIsFocused();
     useEffect(() => {
-        getResumeList().then(resumeList => {
-            setResumeList(resumeList);
-        })
-        const refresh = navigation.addListener('focus', ()=>{getResumeList();});
-        return refresh;
-    }, [])
+        if (isFocused){
+            getResumeList().then(resumeList => {
+                setResumeList(resumeList);
+            })
+        }
+    }, [isFocused])
 
     const handleApply = async() => {
-        console.log(selectedResume, selectedRole)
+        // console.log(selectedResume, selectedRole)
         if (selectedResume===null || selectedRole===null) {
             return Alert.alert("안내", "이력서 또는 역할을 선택해주세요.")
         }

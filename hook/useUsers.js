@@ -159,7 +159,6 @@ const useUsers = () => {
     const sessionCheck = async(route) => {
         const pageName = route.name;
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        // console.log(token);
         if (pageName==='Login'){
             // 1. 세션이 존재하지 않음
             if (token?.session === undefined) {
@@ -214,7 +213,7 @@ const useUsers = () => {
         // 로그인 페이지가 아닌 다른 페이지의 Session Check
         else {
             if (token?.token) {
-                console.log(pageName,': 토큰 체크 완료.');
+                // console.log(pageName,': 토큰 체크 완료.');
             } else {
                 console.log('Session Check : 토큰이 만료되었습니다. 다시 로그인해주세요.')
                 AsyncStorage.clear();

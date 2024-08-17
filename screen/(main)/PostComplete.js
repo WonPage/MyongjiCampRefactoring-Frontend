@@ -36,7 +36,8 @@ export default function PostComplete({navigation}){
         }
         postCompleteBoard(postData).then(data=>{
             if (!data.isFailed) {
-                navigation.replace('MainNavigation') //홈으로 이동
+                // navigation.replace('MainNavigation') //홈으로 이동
+                navigation.navigate('Finish');
             } else {
                 Alert.alert('안내', '글 작성에 문제가 발생했습니다.');
             }
@@ -58,7 +59,7 @@ export default function PostComplete({navigation}){
                     onChangeText={setPostContent} value={postContent}/>
             </View>
             <View style={{ height: hp(25), marginBottom: hp(3) }}>
-                <Text style={{ marginLeft: 3, marginBottom: 3 }}>이미지 (최대 3장)</Text>
+                <Text style={{ marginLeft: 3, marginBottom: 3 }}>이미지 (최대 5장)</Text>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{alignItems:'center'}}>
                     {postImages.map((img, index) => (
                         <View key={index}>

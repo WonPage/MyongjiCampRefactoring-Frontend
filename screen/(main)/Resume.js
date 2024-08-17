@@ -5,18 +5,19 @@ import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react
 import useResume from "../../hook/useResume";
 import { Ionicons } from "@expo/vector-icons";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
 
 const Resume = ({navigation}) => {
     const [resumeList, setResumeList] = useState(null);
     const {getResumeList} = useResume();
+    const isFocused = useIsFocused();
     useEffect(()=>{
-        getResumeList().then(resumes=>{
-            setResumeList(resumes);
-        })
-        const refresh = navigation.addListener('focus', ()=>{getResumeList();});
-        return refresh;
-    },[])
+        if (isFocused){
+            getResumeList().then(resumes=>{
+                setResumeList(resumes);
+            })
+        }
+    },[isFocused])
     const handleResumeAdd = () => {
         navigation.navigate('ResumeAddModal');
     }

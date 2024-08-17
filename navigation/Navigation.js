@@ -28,8 +28,6 @@ import HomeSearch from "../screen/(main)/HomeSearch";
 import Finish from "../screen/(main)/Home_Finish";
 import PostDetail from "../screen/(main)/PostDetail";
 import BoardUpdateModal from "../modal/BoardUpdateModal";
-import BoardReportModal from "../modal/BoardReportModal";
-import CommentReportModal from "../modal/CommentReportModal";
 import BoardDeleteModal from "../modal/BoardDeleteModal";
 import CommentDeleteModal from "../modal/CommentDeleteModal";
 import Search from "../screen/(main)/Search";
@@ -106,8 +104,6 @@ const Navigation = () => {
                     <Stack.Screen name="ResumeUpdateModal" component={ResumeUpdateModal} />
                     <Stack.Screen name="ResumeAddModal" component={ResumeAddModal} />
                     <Stack.Screen name="BoardUpdateModal" component={BoardUpdateModal} />
-                    <Stack.Screen name="BoardReportModal" component={BoardReportModal} />
-                    <Stack.Screen name="CommentReportModal" component={CommentReportModal} />
                     <Stack.Screen name="BoardDeleteModal" component={BoardDeleteModal} />
                     <Stack.Screen name="CommentDeleteModal" component={CommentDeleteModal}/>
                     <Stack.Screen name="ReportModal" component={ReportModal} />
@@ -138,15 +134,15 @@ const MainNavigation = ({navigation}) => {
             tabBarStyle:{ height: hp('8.5%'), paddingTop:hp('0.5%'), paddingBottom:hp('1%')},
         }}>
             <Tab.Screen name="Home" component={HomeNavigation}
-            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '홈', tabBarIcon: ({color, size}) => <Octicons name="home" size={24} color={color} />,
             headerTitle: '명지캠프'}}/>
             <Tab.Screen name="Scrap" component={Scrap}
-            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '스크랩', tabBarIcon: ({color, size}) => <Feather name="bookmark" size={24} color={color} />}}/>
             <Tab.Screen name="PostButton" component={PostButton}
             options={{ title: '글쓰기', tabBarIcon: ({color, size}) => <AntDesign name="pluscircle" size={34} color={'#003366'} />,
             tabBarButton: (props) => (<TouchableOpacity activeOpacity={0.7} {...props} onPress={()=>{navigation.push('Post');}}/>), tabBarLabelStyle: {display: 'none'}}}/>
             <Tab.Screen name="Apply" component={Apply}
-            options={{ unmountOnBlur:true, headerStyle:{backgroundColor:'#FFFBEB'}, title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
+            options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '지원현황', tabBarIcon: ({color, size}) => <FontAwesome5 name="folder-open" size={24} color={color} />}}/>
             <Tab.Screen name="MyPage" component={MyPage}
             options={{ headerStyle:{backgroundColor:'#FFFBEB'}, title: '마이페이지', tabBarIcon: ({color, size}) => <Octicons name="person" size={24} color={color} />}}/>
         </Tab.Navigator>

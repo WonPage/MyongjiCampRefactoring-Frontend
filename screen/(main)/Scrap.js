@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from "react";
 import useUsers from "../../hook/useUsers";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import useBoard from "../../hook/useBoard";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -16,17 +16,30 @@ const Scrap = ({navigation, route}) => {
         sessionCheck(route);
     })
     const [scrapList, setScrapList] = useState([]);
+    const [completeScrapList, setCompleteScrapList] = useState([]);
     const [statusMode, setStatusMode] = useState('RECRUIT_ONGOING');
+
+    const isFocused = useIsFocused();
+
     useEffect(()=>{
+      if (isFocused){
         getScrapList(statusMode).then(response=>{
             if (!response.isFailed){
+              if (statusMode !== 'COMPLETE'){
                 const scrapList = response.scrapList.filter(item=>item.recruitStatus===statusMode);
                 setScrapList(scrapList);
+                setCompleteScrapList([]);
+              } else if (statusMode === 'COMPLETE') {
+                const completeScrapList = response.scrapList.filter(item=>item.boardType==='complete');
+                setScrapList([]);
+                setCompleteScrapList(completeScrapList);
+              }
             } else {
                 Alert.alert('스크랩 목록을 불러올 수 없습니다.');
             }
         })
-    },[statusMode])
+      }
+    },[isFocused, statusMode])
     return(
         <View style={{flex:1, backgroundColor:'#495579', paddingHorizontal:wp(4)}}>
           <ScrollView contentContainerStyle={scrapList.length === 0 ? { flex: 1, backgroundColor:'#495579'} : {backgroundColor:'#495579'}}>
@@ -50,23 +63,21 @@ const Scrap = ({navigation, route}) => {
                 <Text style={statusMode === 'COMPLETE' ? { color: '#FFFFFF' , fontWeight:'500' } : { }}>개발 완료</Text>
               </TouchableOpacity>
             </View>
-            {scrapList.length === 0 ? (
+            {completeScrapList.length===0 && scrapList.length === 0 ? (
               <Empty/>
             ) : (
               <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingTop:hp(3)}}>
-              {scrapList.map((item, index) => {
+              { scrapList.length>0 && scrapList.map((item, index) => {
                 const date = new Date(item?.modifiedDate);      
                 const year = date.getFullYear();
                 const month = date.getMonth() + 1;
                 const newMonth = month.toString().padStart(2, '0');
                 const day = date.getDate().toString().padStart(2, '0');
                 const dateFormat = `${year}.${newMonth}.${day}`   
-                console.log(item);
                 return (
-                  <TouchableOpacity activeOpacity={0.4} key={index} onPress={()=>navigation.navigate('PostDetail', {
-                    title:(statusMode==='RECRUIT_ONGOING'?'모집 중':
-                    statusMode==='RECRUIT_COMPLETE'?'모집 완료':
-                    statusMode==='COMPLETE'?'개발 완료':undefined), boardId:item.boardId})}>
+                  <TouchableOpacity activeOpacity={0.4} key={index} onPress={
+                    item.boardType==='recruit'? ()=>navigation.navigate('PostDetail', { title:(statusMode==='RECRUIT_ONGOING'?'모집 중': statusMode==='RECRUIT_COMPLETE'?'모집 완료':undefined), boardId:item.boardId})
+                  : item.boardType==='complete' ? ()=>navigation.navigate('PostCompleteDetail', {boardId:item.boardId}) : undefined }>
                     <View style={{
                       borderRadius: 10,  marginBottom: hp('1.5%'), elevation: 1,
                       backgroundColor: 'white', padding: hp('2%')}}>
@@ -77,7 +88,18 @@ const Scrap = ({navigation, route}) => {
                       ) : undefined}
                       <View style={{}}>
                         <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                          <Text style={{fontWeight:'500', fontSize:13, width:wp(40)}}>{`${item.roles}`}</Text>
+                          <View style={{flexDirection:'row'}}>
+                            {item.roles.map((role,index)=>{
+                              return (
+                                <View key={index} style={[{paddingHorizontal:wp(1), marginRight:wp(2)},
+                                  role=='BACK'? {backgroundColor:'#8FCACA'}: role=='FRONT' ? {backgroundColor:'#FFAEA5'} :
+                                  role=='DESIGN' ? {backgroundColor:'#EFD0B2'}: role=='PM' ? {backgroundColor:'#CBAACB'} :
+                                  role=='AI' ? {backgroundColor: '#F3B0C3'}: role=='FULL' ? {backgroundColor:'#B6CFB6'} : {backgroundColor: '#AFAFAF'}]}>
+                                  <Text style={{fontWeight:'500', fontSize:12}}>{role}</Text>
+                                </View>
+                              )
+                            })}
+                          </View>
                           <View style={{flexDirection:'row', alignItems:'center'}}>
                             <Text style={{fontWeight:'500', fontSize:15, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
                             <MaterialCommunityIcons name="comment-outline" size={18} color="black" />
@@ -92,6 +114,41 @@ const Scrap = ({navigation, route}) => {
                     </View>
                   </TouchableOpacity>
                 ) 
+              })}
+              { completeScrapList.length>0 && completeScrapList.map((item, index)=>{
+                const date = new Date(item?.modifiedDate);      
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const newMonth = month.toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                const dateFormat = `${year}.${newMonth}.${day}` 
+                return (
+                  <TouchableOpacity activeOpacity={0.4} key={index} onPress={()=>navigation.navigate('PostCompleteDetail', {boardId:item.boardId})}>
+                    <View style={{
+                      borderRadius: 10,  marginBottom: hp('1.5%'), elevation: 1,
+                      backgroundColor: 'white', padding: hp('2%'), flexDirection:'row'}}>
+                      {item.imageUrl ? (
+                        <View>
+                          <Image source={{uri:item.imageUrl}} style={{width:wp(20), height:wp(20)}}/>
+                        </View>
+                      ) : undefined}
+                    <View style={{flex:1, marginLeft:wp(2)}}>
+                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                            <Text style={{fontWeight:'500', fontSize:13, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
+                            <View style={{flexDirection:'row'}}>
+                              <MaterialCommunityIcons name="comment-outline" size={18} color="black" />
+                              <Text style={{marginLeft:hp('0.3%')}}>{item.commentCount}</Text>
+                              <FontAwesome name="bookmark-o" size={18} color="black" style={{marginLeft:hp('1.5%')}}/>
+                              <Text style={{marginLeft:hp('0.5%')}}>{item.scrapCount}</Text>
+                            </View>
+                        </View>
+                        <View style={{}}>
+                            <Text style={{fontSize:21, fontWeight:'500'}}>{`${item.title}`}</Text>
+                        </View>
+                    </View>
+                    </View>
+                  </TouchableOpacity>
+                )
               })}
               </ScrollView>
             )}

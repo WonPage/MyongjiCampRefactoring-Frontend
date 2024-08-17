@@ -3,7 +3,7 @@
  * 240811 - */ 
 import { useEffect, useState } from "react";
 import useUsers from "../../hook/useUsers";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import useApply from "../../hook/useApply";
 import { ScrollView, Text, Touchable, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -26,9 +26,12 @@ const Apply = ({navigation, route}) => {
             setReceivedResume(res.data);
         })
     } 
+    const isFocused = useIsFocused();
     useEffect(()=>{
-        getResumes();
-    },[])
+        if (isFocused){
+            getResumes();
+        }
+    },[isFocused])
     const handleShowResume = (resumeId) => {
         getResumeDetail(resumeId)
         .then(res =>{
@@ -77,24 +80,20 @@ const Apply = ({navigation, route}) => {
                                     <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                                         <View style={{backgroundColor:'#251749', borderRadius:10, justifyContent:'center', alignItems:'center', width:wp('13%'), height:hp('3%'), paddingBottom:hp('0.5%')}}>
                                             <Text style={{color:'white', fontSize:13}}>{
-                                                resume.finalStatus==='PENDING' ? (
-                                                    resume.firstStatus === 'PENDING' ? '대기중':
-                                                    resume.firstStatus === 'ACCEPTED' ? '승인':
-                                                    resume.firstStatus === 'REJECTED' ? '미승인':
-                                                    resume.firstStatus === 'DELETED' ? '삭제됨' : undefined
-                                                ):
-                                                resume.finalStatus === 'ACCEPTED' ? (
-                                                    resume.firstStatus === 'ACCEPTED' ? '수락':
-                                                    resume.firstStatus === 'DELETED' ? '삭제됨' : undefined
-                                                ):
-                                                resume.finalStatus === 'REJECTED' ? (
-                                                    resume.firstStatus === 'ACCEPTED' ? '거절':
-                                                    resume.firstStatus === 'DELETED' ? '삭제됨' : undefined
-                                                ): undefined}</Text>
+                                                resume.firstStatus==='PENDING' ? "대기 중" :
+                                                resume.firstStatus==='ACCEPTED' ?  (
+                                                    resume.finalStatus === "PENDING" ? "승인" :
+                                                    resume.finalStatus === "ACCEPTED" ? "수락" :
+                                                    resume.finalStatus === 'REJECTED' ? "거절" : undefined
+                                                ) :
+                                                resume.firstStatus==="REJECTED" ? (
+                                                    resume.finalStatus === 'PENDING' ? '미승인' : undefined
+                                                ) :
+                                                resume.firstStatus==='DELETED' ? "삭제됨" : undefined}</Text>
                                         </View>
                                         <View style={{flexDirection:'row', alignItems:'center'}}>
                                             <Text style={{fontSize:13, color:'#FFFBEB'}}>{dateFormat}</Text>
-                                            <TouchableOpacity onPress={()=>navigation.navigate("ApplyMenuModal", {boardId: resume.boardId, callback: getResumes})}>
+                                            <TouchableOpacity onPress={()=>navigation.navigate("ApplyMenuModal", {boardId: resume.boardId})}>
                                                 <Entypo style={{marginLeft: wp('1%')}} name="dots-three-vertical" size={15} color="#FFFBEB" />
                                             </TouchableOpacity>
                                         </View>
