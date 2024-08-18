@@ -152,7 +152,7 @@ export function Complete({navigation}){
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false} style={{backgroundColor:BACKGROUND_COLOR}} contentContainerStyle={{backgroundColor:BACKGROUND_COLOR}}>
                 {completeList ? completeList.map((item, index)=>{
-                //    console.log('item',item)
+                   console.log('item',item)
                     const date = new Date(item?.modifiedDate);
                     const year = date.getFullYear();
                     const month = date.getMonth() + 1;

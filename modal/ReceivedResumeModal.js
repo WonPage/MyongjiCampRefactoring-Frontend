@@ -36,6 +36,7 @@ export default function ReceivedResumeModal({navigation, route}){
                 <View style={{alignItems:'center', paddingVertical:hp('2%')}}>
                     <Text style={{fontSize:25, color:'#251749', fontWeight:500, marginBottom:hp(1)}}>이력서 목록</Text>
                     {data.length===0 ? <Text style={{fontSize:20}}>없어요🤭</Text> : data.map((value, index) => {
+                        console.log(value);
                         return (
                         <TouchableOpacity onPress={value.firstStatus === 'ACCEPTED'||value.firstStatus==='REJECTED' ? ()=>handleShowPrevResume(value.applicationId) : ()=>handleShowResume(value.applicationId)} 
                         activeOpacity={0.6} key={index} style={{marginVertical:hp('1%'), paddingHorizontal:'3%',

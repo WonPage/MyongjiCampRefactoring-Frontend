@@ -68,7 +68,7 @@ export default function Finish({navigation}){
                         <View style={{justifyContent:'space-between', flex:1}}>
                             <View>
                                 <Text>{dateFormat}</Text>
-                                <Text style={{fontSize:27}}>{item.title}</Text>
+                                <Text style={{fontSize:25}} ellipsizeMode="tail" numberOfLines={2}>{item.title}</Text>
                             </View>
                             <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
                                 <MaterialCommunityIcons name="comment-outline" size={23} color="black" />

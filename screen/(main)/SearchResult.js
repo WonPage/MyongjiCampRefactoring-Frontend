@@ -45,7 +45,7 @@ export default function SearchResult({navigation, route}){
             if (res.status == 200){
                 const result = res.data.data
                 setResultList(result);
-                console.log(result);
+                // console.log(result);
             }
             else {
                 console.log("검색 결과 호출 오류")
@@ -125,7 +125,19 @@ export default function SearchResult({navigation, route}){
                             <TouchableOpacity key={index} onPress={()=>{moveDetail(item.boardId)}} style={{marginBottom:hp(1)}} >
                                 <View style={{ marginHorizontal:wp(3), borderRadius:wp(2), backgroundColor:'white', padding:wp(4), elevation:2}}>
                                     <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'500', fontSize:13, width:wp(40)}}>{`${item.roles}`}</Text>
+                                        <View style={{flexDirection:'row', width:wp(40)}}>
+                                            {item.roles.map((role,index)=>{
+                                            return (
+                                                <View key={index} style={[{paddingHorizontal:wp(1), marginRight:wp(2)},
+                                                role=='BACK'? {backgroundColor:'#8FCACA'}: role=='FRONT' ? {backgroundColor:'#FFAEA5'} :
+                                                role=='DESIGN' ? {backgroundColor:'#EFD0B2'}: role=='PM' ? {backgroundColor:'#CBAACB'} :
+                                                role=='AI' ? {backgroundColor: '#F3B0C3'}: role=='FULL' ? {backgroundColor:'#B6CFB6'} : {backgroundColor: '#AFAFAF'}]}>
+                                                <Text style={{fontWeight:'500', fontSize:12}}>{role}</Text>
+                                                </View>
+                                            )
+                                            })}
+                                        </View>
+
                                         <View style={{flexDirection:'row', alignItems:'center'}}>
                                             <Text style={{fontWeight:'500', fontSize:15, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
                                             <MaterialCommunityIcons name="comment-outline" size={18} color="black" />

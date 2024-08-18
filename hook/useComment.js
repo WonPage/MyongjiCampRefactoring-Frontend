@@ -71,7 +71,7 @@ export default function useComment(){
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}`},
         }).then(res=>{
             if (res.data.status===200){
-                console.log(token)
+                // console.log(token)
                 // Alert.alert('안내', res.data.data); 
                 return {isFailed:false};
             } else {

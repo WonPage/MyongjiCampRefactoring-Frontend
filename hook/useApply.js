@@ -1,5 +1,8 @@
 /** 담당자 채윤 
- * 240618 - 지원서 훅 설계 */
+ * 240618 - 지원서 훅 설계 
+ * 240816 - 지원 처리 관련 구현 
+ * 240818 - 작성한 개발완료 게시글 목록 불러오기 구현*/
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios"
@@ -160,7 +163,6 @@ export default function useApply() {
         })
         return data;
     }
-
     /** 지원 보내기 */
     const sendApply = async(boardId, resume, selectedRole) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
@@ -184,8 +186,24 @@ export default function useApply() {
             })
         })
     }
+    /** 내가 작성한 개발완료 게시글 목록 */
+    const getMyCompleteBoardList = async() => {
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/complete/writer`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
+        .then(res => {
+            return res.data.data;
+        })
+        .catch(err => {
+            console.log(err.response);
+        })
+        return result;
+    }
 
     return { getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, resumeProcess, cancleApply, completeRecruit,
-        sendApply, resumeFinalProcess
+        sendApply, resumeFinalProcess, getMyCompleteBoardList
      }
 }

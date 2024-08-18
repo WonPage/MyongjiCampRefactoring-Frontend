@@ -24,11 +24,11 @@ const MyPage = ({navigation, route}) => {
         });
     },[])
     const page_list = [
-        {page:'Notice', title:'공지사항'},
+/*         {page:'Notice', title:'공지사항'},
         {page:'FAQ', title:'FAQ'},
         {page:'Event', title:'이벤트'},
         {page:'Information', title:'이용안내'},
-        {page:'NotifySetting', title:'알림설정'},
+        {page:'NotifySetting', title:'알림설정'}, */
         {page:'PasswordChange', title: '비밀번호 변경'},
         {page:'Logout', title:'로그아웃'}
     ]

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useBoard from "../../hook/useBoard";
 import useUsers from "../../hook/useUsers";
 import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
-import { Image, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
@@ -111,6 +111,14 @@ function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap}){
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const dateFormat = `${year}.${newMonth}.${day} ${hours}:${minutes}`
+    const handleMoveRecruit = (recruitBoardId) => {
+        if (recruitBoardId){
+            navigation.navigate("PostDetail", {boardId: recruitBoardId, title:'모집 완료'});
+        } else {
+            Alert.alert('안내', '모집 페이지가 없습니다.');
+            // Alert.alert('안내', '모집 페이지로 이동할 수 없습니다.');
+        }
+    }
     return (
         <>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -144,13 +152,9 @@ function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap}){
         </View>
         <View>
             <View>
-                {/* <Text style={{marginTop: hp('2%'), marginLeft:wp(1)}}>제목</Text> */}
                 <Text style={{fontSize:27, marginTop:hp(2)}}>{postData.title}</Text>
             </View>
-            {/* <Text style={{marginTop: hp('2%'), marginLeft:wp(1)}}>내용</Text> */}
-            {/* <View style={{marginTop:hp(1), minHeight:hp('20%'), borderWidth:1, borderRadius:wp(3), padding:wp(3)}}> */}
-                <Text style={{marginTop:hp(2)}}>{postData.content}</Text>
-            {/* </View> */}
+            <Text style={{marginTop:hp(2)}}>{postData.content}</Text>
             <View style={{ alignItems:'center'}}>
                 {postData.imageUrls.map((image, index)=>{
                     return (
@@ -159,6 +163,12 @@ function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap}){
                         </View>
                     )
                 })}
+            </View>
+            <View style={{justifyContent:'center', alignItems:'center'}}>
+                <TouchableOpacity onPress={()=>handleMoveRecruit(postData.recruitBoardId)}
+                    activeOpacity={0.7} style={{ marginVertical: hp('3%'), backgroundColor: '#263159', width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center', borderRadius:wp(3)}}>
+                        <Text style={{ fontSize: 17, color:'white' }}>{"모집 페이지"}</Text>
+                </TouchableOpacity>
             </View>
             <View style={{marginTop:hp(2), marginBottom:hp(3), alignItems:'center'}}>
                 <TouchableOpacity activeOpacity={0.6} onPress={()=>{
@@ -176,7 +186,7 @@ function BoardData({postData, userId, boardId, refreshBoardDetail, isScrap}){
     )
 }
 
-function Comment({commentList, userId, writerId, boardId, refreshComment, handleReply}) {
+function Comment({commentList, userId, writerId, boardId, handleReply}) {
     const navigation = useNavigation();
     const iconPath = {
         1 : require('../../assets/profile-icon/ai.jpg'),
@@ -203,7 +213,6 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const longFormat = `${year}.${month}.${day}`
             const nowFormat = `${hours}:${minutes}`
-            // console.log(comment);
             return (
                 <View key={comment.id}>
                     <View style={{ borderRadius: wp('5%'), padding: wp('2%'), marginTop: hp('1%'), marginBottom: hp('1%') }}>
@@ -224,7 +233,7 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
                                         <Text style={{ fontSize: 13 }}>댓글</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id, callback:refreshComment})}>
+                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id})}>
                                         <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
                                     </TouchableOpacity></>) : writerId === userId ? (<>
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
@@ -268,7 +277,7 @@ function Comment({commentList, userId, writerId, boardId, refreshComment, handle
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
                                     { userId === comm.writerId ? (
-                                        <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comm.id, callback:refreshComment})}>
+                                        <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comm.id})}>
                                             <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
                                         </TouchableOpacity>) :
                                     userId === writerId ? (
@@ -328,10 +337,10 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
                     <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('4%'), height: wp('4%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:wp('6%') }}
                         isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} fillColor="#495579"/>
                     <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray', textAlignVertical:'center', marginLeft:wp('-4%'), marginRight:wp('2%'), fontSize:12}}>비밀</Text>
-                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
+                    <TextInput style={{ paddingHorizontal: wp('3%'), width:wp(56), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
                         value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
                     <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
-                        style={{ width: wp('15%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
+                        style={{ width: wp('13%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
                         <Text style={{ color: 'white' }}>대댓</Text>
                     </TouchableOpacity>
                 </View>

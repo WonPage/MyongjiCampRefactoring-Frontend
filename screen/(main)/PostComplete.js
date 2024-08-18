@@ -5,7 +5,8 @@ import * as ImagePicker from 'expo-image-picker'
 import { AntDesign } from "@expo/vector-icons";
 import useBoard from "../../hook/useBoard";
 
-export default function PostComplete({navigation}){
+export default function PostComplete({navigation, route}){
+    const {boardId} = route.params;
     const [postTitle, setPostTitle] = useState('');
     const [postContent, setPostContent] = useState('');
     const [postImages, setPostImages] = useState([]); 
@@ -32,7 +33,8 @@ export default function PostComplete({navigation}){
         const postData = {
             title: postTitle,
             content: postContent,
-            images: postImages
+            images: postImages,
+            recruitId : boardId
         }
         postCompleteBoard(postData).then(data=>{
             if (!data.isFailed) {

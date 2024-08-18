@@ -207,7 +207,7 @@ export default function useBoard(){
     }
     /** 개발 완료 게시글 작성하기 */
     const postCompleteBoard = async(postData) => {
-        const {title, content, images} = postData;
+        const {title, content, images, recruitId} = postData;
         if (title.length < 1 || content.length < 1) {
             Alert.alert('안내', '빈칸을 채워주세요.');
             return {isFailed:true};
@@ -227,7 +227,7 @@ export default function useBoard(){
                 name: image.fileName
             })
         })
-        const data = axios.post(`${API_URL}/api/auth/complete`, formData, {
+        const data = axios.post(`${API_URL}/api/auth/complete/${recruitId}`, formData, {
             headers : {
                 'Content-Type':'multipart/form-data',
                 Authorization: `Bearer ${token.token}`,

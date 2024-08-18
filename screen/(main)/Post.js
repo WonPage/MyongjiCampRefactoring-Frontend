@@ -35,7 +35,7 @@ const Post = ({navigation, route}) => {
             roleAssignments: roleData
         }
         postBoard(postData).then(data=>{
-            if (!data.isFailed) navigation.pop();
+            if (!data.isFailed) navigation.navigate('OnGoing');
         })
     }
     return (

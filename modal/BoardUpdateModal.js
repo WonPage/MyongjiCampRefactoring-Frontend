@@ -53,6 +53,14 @@ export default function BoardUpdateModal({navigation, route}){
             updateBoard(updateData).then(data=>{
                 if (!data.isFailed) {
                     navigation.pop();
+
+                    let isMemberFixed = false;
+                    roleData.map(value=>{
+                        if (value.appliedNumber < value.requiredNumber){
+                            isMemberFixed = true;
+                        }
+                    })
+                    if (isMemberFixed) navigation.navigate('OnGoing');
                 }
             })
         }

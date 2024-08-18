@@ -44,9 +44,6 @@ const PostDetail = ({navigation, route}) => {
     const refreshComment = () => {
         getComment(boardId).then(data=>{
             if (!data.isFailed){
-                data.commentList.map((value, index)=>{
-                    // console.log(index, ':', value);
-                })
                 setCommentList(data.commentList)
             }
         })
@@ -113,6 +110,9 @@ const PostDetail = ({navigation, route}) => {
                 ToastAndroid.show('대댓글이 취소되었습니다.', ToastAndroid.SHORT);
             }, 5);
         }
+    }
+    const handleMoveComplete = (completeBoardId) => {
+        navigation.navigate("PostCompleteDetail", {boardId: completeBoardId});
     }
     return(
         <View>
@@ -191,9 +191,9 @@ const PostDetail = ({navigation, route}) => {
                                     <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? ('모집 마감하기') : ('지원하기')}</Text>
                             </TouchableOpacity>
                         ) : postData.status=="RECRUIT_COMPLETE" ? (
-                            <TouchableOpacity onPress={postData.writerId === userId ? handleDevelopComplete : undefined}
-                                activeOpacity={0.7} style={[postData.writerId === userId?{backgroundColor: '#263159'}:{backgroundColor: 'lightgray'}, { marginTop: hp('6%'), width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center', borderRadius:wp(3) }]}>
-                                    <Text style={{ fontSize: 17, color:'white' }}>{postData.writerId === userId ? ('개발 완료하기') : ('지원 마감')}</Text>
+                            <TouchableOpacity onPress={postData.completeBoardId ? ()=>handleMoveComplete(postData.completeBoardId) : postData.writerId === userId ? handleDevelopComplete : undefined}
+                                activeOpacity={0.7} style={[postData.completeBoardId ? {backgroundColor: '#263159'} : postData.writerId === userId?{backgroundColor: '#263159'}:{backgroundColor: 'lightgray'}, { marginTop: hp('6%'), width: wp('65%'), height: hp('8%'), justifyContent: 'center', alignItems: 'center', borderRadius:wp(3) }]}>
+                                    <Text style={{ fontSize: 17, color:'white' }}>{postData.completeBoardId ? ("개발 완료 페이지") : postData.writerId === userId ? ('개발 완료하기') : ('지원 마감')}</Text>
                             </TouchableOpacity>
                         ) : (
                             <></>
@@ -254,7 +254,7 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
                                         <Text style={{ fontSize: 13 }}>댓글</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id, callback:refreshComment})}>
+                                    <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comment.id})}>
                                         <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
                                     </TouchableOpacity></>) : writerId === userId ? (<>
                                     <TouchableOpacity onPress={() => handleReply(comment.id, comment.nickname)}>
@@ -298,7 +298,7 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
                                     { userId === comm.writerId ? (
-                                        <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comm.id, callback:refreshComment})}>
+                                        <TouchableOpacity onPress={()=>navigation.navigate("CommentDeleteModal", {boardId:boardId, commentId:comm.id})}>
                                             <Text style={{ fontSize: 13, marginLeft: hp('1%') }}>삭제</Text>
                                         </TouchableOpacity>) :
                                     userId === writerId ? (
@@ -362,10 +362,10 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
                 <BouncyCheckbox innerIconStyle={{ borderRadius: wp('0.5%'), width: wp('4%'), height: wp('4%') }} iconStyle={{ borderRadius: wp('1%'), width: wp('6%'), height:wp('6%') }}
                     isChecked={isSecret} onPress={(isChecked) => setIsSecret(isChecked)} fillColor="#495579"/>
                 <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray', textAlignVertical:'center', marginLeft:wp('-4%'), marginRight:wp('2%'), fontSize:12}}>비밀</Text>
-                <TextInput style={{ paddingHorizontal: wp('3%'), width:wp('60%'), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
+                <TextInput style={{ paddingHorizontal: wp('3%'), width:wp(56), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
                     value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
                 <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
-                    style={{ width: wp('15%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
+                    style={{ width: wp('13%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
                     <Text style={{ color: 'white' }}>대댓</Text>
                 </TouchableOpacity>
             </View>
