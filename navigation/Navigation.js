@@ -28,8 +28,6 @@ import HomeSearch from "../screen/(main)/HomeSearch";
 import Finish from "../screen/(main)/Home_Finish";
 import PostDetail from "../screen/(main)/PostDetail";
 import BoardUpdateModal from "../modal/BoardUpdateModal";
-import BoardReportModal from "../modal/BoardReportModal";
-import CommentReportModal from "../modal/CommentReportModal";
 import BoardDeleteModal from "../modal/BoardDeleteModal";
 import CommentDeleteModal from "../modal/CommentDeleteModal";
 import Search from "../screen/(main)/Search";
@@ -38,6 +36,15 @@ import ReportModal from "../modal/ReportModal";
 import ApplyMenuModal from "../modal/ApplyMenuModal";
 import RecruitCompleteCheckModal from "../modal/RecruitCompleteCheckModal";
 import ApplyModal from "../modal/ApplyModal";
+import SentResumeModal from "../modal/SentResumeModal";
+import ReceivedResumeModal from "../modal/ReceivedResumeModal";
+import ReceivedResumeDetailModal from "../modal/ReceivedResumeDetailModal";
+import ApplyProcessModal from "../modal/ApplyProcessModal";
+import PrevReceivedResumeModal from "../modal/PrevReceivedResumeModal";
+import ApplyFinalProcessModal from "../modal/ApplyFinalProcessModal";
+import PostComplete from "../screen/(main)/PostComplete";
+import PostCompleteDetail from "../screen/(main)/PostCompleteDetail";
+import CompleteBoardUpdateModal from "../modal/CompleteBoardUpdateModal";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -75,7 +82,13 @@ const Navigation = () => {
                 options={option=>({title:option.route.params.title, headerTitleAlign:'center'})} />
                 <Stack.Screen name="Resume" component={Resume}
                 options={{title: '이력서', headerTitleAlign: 'center', headerTitleStyle:{fontSize: 28}}}  />
-
+                <Stack.Screen name="PostComplete" component={PostComplete}
+                options={{headerTitle:'개발 완료 글 작성',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
+                <Stack.Screen name="PostCompleteDetail" component={PostCompleteDetail}
+                options={option=>({title:"개발 완료", headerTitleAlign:'center'})} />
+                <Stack.Screen name="CompleteBoardUpdateModal" component={CompleteBoardUpdateModal}
+                options={{headerTitle:'개발 완료 글 수정',headerTitleAlign: 'center',cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid)}}/>
+                
                 {/* Other Page */}
                 <Stack.Screen name="Event" component={Event}/>
                 <Stack.Screen name="FAQ" component={FAQ}/>
@@ -91,14 +104,18 @@ const Navigation = () => {
                     <Stack.Screen name="ResumeUpdateModal" component={ResumeUpdateModal} />
                     <Stack.Screen name="ResumeAddModal" component={ResumeAddModal} />
                     <Stack.Screen name="BoardUpdateModal" component={BoardUpdateModal} />
-                    <Stack.Screen name="BoardReportModal" component={BoardReportModal} />
-                    <Stack.Screen name="CommentReportModal" component={CommentReportModal} />
                     <Stack.Screen name="BoardDeleteModal" component={BoardDeleteModal} />
                     <Stack.Screen name="CommentDeleteModal" component={CommentDeleteModal}/>
                     <Stack.Screen name="ReportModal" component={ReportModal} />
                     <Stack.Screen name="ApplyMenuModal" component={ApplyMenuModal} />
                     <Stack.Screen name="RecruitCompleteCheckModal" component={RecruitCompleteCheckModal} />
                     <Stack.Screen name="ApplyModal" component={ApplyModal} />
+                    <Stack.Screen name="SentResumeModal" component={SentResumeModal} />
+                    <Stack.Screen name="ReceivedResumeModal" component={ReceivedResumeModal} />
+                    <Stack.Screen name="ReceivedResumeDetailModal" component={ReceivedResumeDetailModal} />
+                    <Stack.Screen name="PrevReceivedResumeModal" component={PrevReceivedResumeModal} />
+                    <Stack.Screen name="ApplyProcessModal" component={ApplyProcessModal} />
+                    <Stack.Screen name="ApplyFinalProcessModal" component={ApplyFinalProcessModal} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>

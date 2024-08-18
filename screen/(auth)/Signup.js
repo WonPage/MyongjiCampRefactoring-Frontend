@@ -55,7 +55,7 @@ const Signup = ({navigation}) => {
         else setIsCodeEmpty(true);
     },[code])
     const handleVerifyCode = () => {
-        navigation.push('SignupPassword', {email:email});
+        // navigation.push('SignupPassword', {email:email});
         verifyCode(email, code).then(isFailed=>{
             if (!isFailed) {
                 //다음 단계로 이동

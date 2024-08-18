@@ -3,7 +3,7 @@
 import { Entypo, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp} from "react-native-responsive-screen";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -45,6 +45,7 @@ export default function SearchResult({navigation, route}){
             if (res.status == 200){
                 const result = res.data.data
                 setResultList(result);
+                // console.log(result);
             }
             else {
                 console.log("검색 결과 호출 오류")
@@ -59,6 +60,9 @@ export default function SearchResult({navigation, route}){
     },[direction, boardType, status])
     const moveDetail = (boardId) => {
         navigation.navigate('PostDetail', {title: '모집 중', boardId: boardId});
+    }
+    const moveCompleteDetail = (boardId) => {
+        navigation.navigate('PostCompleteDetail', {boardId: boardId});
     }
 
     return (
@@ -105,34 +109,94 @@ export default function SearchResult({navigation, route}){
                 </TouchableOpacity>
             </View>
             <View style={{flex:1}}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {resultList ? resultList.map((item, index)=>{
-                        const date = new Date(item?.modifiedDate);      
-                        const year = date.getFullYear();
-                        const month = date.getMonth() + 1;
-                        const newMonth = month.toString().padStart(2, '0');
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const dateFormat = `${year}.${newMonth}.${day}`  
-                        return (
-                        <TouchableOpacity key={index} onPress={()=>{moveDetail(item.boardId)}} style={{marginBottom:hp(1)}} >
-                            <View style={{ marginHorizontal:wp(3), borderRadius:wp(2), backgroundColor:'white', padding:wp(4), elevation:2}}>
-                                <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                                    <Text style={{fontWeight:'500', fontSize:13, width:wp(40)}}>{`${item.roles}`}</Text>
-                                    <View style={{flexDirection:'row', alignItems:'center'}}>
-                                        <Text style={{fontWeight:'500', fontSize:15, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
-                                        <MaterialCommunityIcons name="comment-outline" size={18} color="black" />
-                                        <Text style={{marginLeft:hp('0.3%')}}>{item.commentCount}</Text>
-                                        <FontAwesome name="bookmark-o" size={18} color="black" style={{marginLeft:hp('1.5%')}}/>
-                                        <Text style={{marginLeft:hp('0.5%')}}>{item.scrapCount}</Text>
+                {resultList?.length==0 ? (
+                    <Empty/>
+                ) : 
+                boardType==='recruit' ? (
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {resultList ? resultList.map((item, index)=>{
+                            const date = new Date(item?.modifiedDate);      
+                            const year = date.getFullYear();
+                            const month = date.getMonth() + 1;
+                            const newMonth = month.toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const dateFormat = `${year}.${newMonth}.${day}`  
+                            return (
+                            <TouchableOpacity key={index} onPress={()=>{moveDetail(item.boardId)}} style={{marginBottom:hp(1)}} >
+                                <View style={{ marginHorizontal:wp(3), borderRadius:wp(2), backgroundColor:'white', padding:wp(4), elevation:2}}>
+                                    <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                        <View style={{flexDirection:'row', width:wp(40)}}>
+                                            {item.roles.map((role,index)=>{
+                                            return (
+                                                <View key={index} style={[{paddingHorizontal:wp(1), marginRight:wp(2)},
+                                                role=='BACK'? {backgroundColor:'#8FCACA'}: role=='FRONT' ? {backgroundColor:'#FFAEA5'} :
+                                                role=='DESIGN' ? {backgroundColor:'#EFD0B2'}: role=='PM' ? {backgroundColor:'#CBAACB'} :
+                                                role=='AI' ? {backgroundColor: '#F3B0C3'}: role=='FULL' ? {backgroundColor:'#B6CFB6'} : {backgroundColor: '#AFAFAF'}]}>
+                                                <Text style={{fontWeight:'500', fontSize:12}}>{role}</Text>
+                                                </View>
+                                            )
+                                            })}
+                                        </View>
+
+                                        <View style={{flexDirection:'row', alignItems:'center'}}>
+                                            <Text style={{fontWeight:'500', fontSize:15, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
+                                            <MaterialCommunityIcons name="comment-outline" size={18} color="black" />
+                                            <Text style={{marginLeft:hp('0.3%')}}>{item.commentCount}</Text>
+                                            <FontAwesome name="bookmark-o" size={18} color="black" style={{marginLeft:hp('1.5%')}}/>
+                                            <Text style={{marginLeft:hp('0.5%')}}>{item.scrapCount}</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={{fontSize:21, fontWeight:'500'}}>{`${item.title}`}</Text>
+                                    <Text style={{fontSize:13, marginTop:hp(0.8), color:'gray'}}>{`예상 기간 - ${item.expectedDuration}`}</Text>
+                                </View>
+                            </TouchableOpacity>
+                                )}) : (<></>)}
+                    </ScrollView>
+                ) : 
+                boardType === 'complete' ? ( 
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {resultList ? resultList.map((item, index)=>{
+                            const date = new Date(item?.modifiedDate);      
+                            const year = date.getFullYear();
+                            const month = date.getMonth() + 1;
+                            const newMonth = month.toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const dateFormat = `${year}.${newMonth}.${day}`  
+                            return (
+                            <TouchableOpacity key={index} onPress={()=>{moveCompleteDetail(item.boardId)}} style={{marginBottom:hp(1), width:wp(95)}}>
+                                <View style={{ marginHorizontal:wp(3), borderRadius:wp(2), backgroundColor:'white', padding:wp(4), elevation:2, flexDirection:'row'}}>
+                                    <View>
+                                        <Image source={{uri:item.firstImage}} style={{width:wp(20), height:wp(20)}}/>
+                                    </View>
+                                    <View style={{justifyContent:'space-between', flex:1}}>
+                                        <View style={{marginLeft:wp(2)}}>
+                                            <Text style={{fontSize:21, fontWeight:'500'}}>{`${item.title}`}</Text>
+                                            <Text style={{fontWeight:'500', fontSize:13, color:'gray', marginBottom:hp(0.2), marginRight:wp(2)}}>{`${dateFormat}`}</Text>
+                                        </View>
+                                        <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
+                                            <MaterialCommunityIcons name="comment-outline" size={18} color="black" />
+                                            <Text style={{marginLeft:hp('0.3%')}}>{item.commentCount}</Text>
+                                            <FontAwesome name="bookmark-o" size={18} color="black" style={{marginLeft:hp('1.5%')}}/>
+                                            <Text style={{marginLeft:hp('0.5%')}}>{item.scrapCount}</Text>
+                                        </View>
                                     </View>
                                 </View>
-                                <Text style={{fontSize:21, fontWeight:'500'}}>{`${item.title}`}</Text>
-                                <Text style={{fontSize:13, marginTop:hp(0.8), color:'gray'}}>{`예상 기간 - ${item.expectedDuration}`}</Text>
-                            </View>
-                        </TouchableOpacity>
-                            )}) : (<></>)}
-                </ScrollView>
+                            </TouchableOpacity>
+                        )}) : (<></>)}
+                    </ScrollView>
+                ) : <></>
+                }
             </View>
         </View>
     )   
 }
+
+function Empty(){
+    return(
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <View style={{backgroundColor:'#A1ADBC', width:wp('85%'), height:hp('50%'), borderRadius:20, justifyContent:'center', alignItems:'center'}}>
+          <Text style={{fontSize:15, color:'#F3F5F6', fontWeight:'500'}}>검색 결과가 없습니다.</Text>
+        </View>
+      </View>
+    )
+  }

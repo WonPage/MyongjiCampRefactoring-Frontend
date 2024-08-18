@@ -5,18 +5,19 @@ import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react
 import useResume from "../../hook/useResume";
 import { Ionicons } from "@expo/vector-icons";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
 
 const Resume = ({navigation}) => {
     const [resumeList, setResumeList] = useState(null);
     const {getResumeList} = useResume();
+    const isFocused = useIsFocused();
     useEffect(()=>{
-        getResumeList().then(resumes=>{
-            setResumeList(resumes);
-        })
-        const refresh = navigation.addListener('focus', ()=>{getResumeList();});
-        return refresh;
-    },[])
+        if (isFocused){
+            getResumeList().then(resumes=>{
+                setResumeList(resumes);
+            })
+        }
+    },[isFocused])
     const handleResumeAdd = () => {
         navigation.navigate('ResumeAddModal');
     }
@@ -30,7 +31,7 @@ const Resume = ({navigation}) => {
             <FlatList data={resumeList} style={{marginHorizontal: hp('3%')}} contentContainerStyle={styles.resume_item_container}
                 ListFooterComponent={resumeList === null || resumeList?.length>=3 ? ( <></> ) : (<TouchableOpacity style={[styles.resume_add_button, {marginTop: hp('5%'), borderColor:'#495579', borderWidth:2}]} onPress={handleResumeAdd}><Text style={{color:'#495579', fontWeight:500}}>+ 이력서 추가하기</Text></TouchableOpacity>)}
                 ItemSeparatorComponent={<View style={{height:hp('6%')}}></View>}
-                renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createDate} id={item.id} setResumeList={setResumeList}/>} />
+                renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createdDate} id={item.id} setResumeList={setResumeList}/>} />
             </View>
         </View>
     )

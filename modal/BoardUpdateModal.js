@@ -10,8 +10,6 @@ import { FontAwesome6 } from "@expo/vector-icons";
 export default function BoardUpdateModal({navigation, route}){
     const postData = route.params.data;
     const boardId = route.params.boardId;
-    const refreshBoardDetail = route.params.callback;
-    const refreshOngoingList = route.params.refresh;
     const [postTitle, setPostTitle] = useState(postData.title);
     const [postContent, setPostContent] = useState(postData.content);
     const [postLocation, setPostLocation] = useState(postData.preferredLocation)
@@ -55,8 +53,14 @@ export default function BoardUpdateModal({navigation, route}){
             updateBoard(updateData).then(data=>{
                 if (!data.isFailed) {
                     navigation.pop();
-                    refreshBoardDetail();
-                    refreshOngoingList();
+
+                    let isMemberFixed = false;
+                    roleData.map(value=>{
+                        if (value.appliedNumber < value.requiredNumber){
+                            isMemberFixed = true;
+                        }
+                    })
+                    if (isMemberFixed) navigation.navigate('OnGoing');
                 }
             })
         }

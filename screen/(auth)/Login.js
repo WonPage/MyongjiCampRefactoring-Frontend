@@ -32,6 +32,7 @@ const Login = ({navigation, route}) => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex:1}}>
             <View style={styles.container}>
                 <View style={styles.container_width}>
+                    <Text style={{alignSelf:'center', fontSize:wp(9), fontWeight:'500'}}>명지 캠프</Text>
                     <View style={styles.icon}>
                         <Image style={styles.myongji_icon} source={require('../../assets/myongjicamp-title.png')} />
                     </View>
@@ -95,13 +96,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     container_width: {
-        marginTop: hp('10%'),
+        marginTop: hp(13),
         width: wp('75%'),
+        alignItems:'stretchs'
     },
     icon: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop:hp('3%'),
+        marginTop:hp(1),
         marginBottom:hp('3%')
     },
     myongji_icon: {

@@ -30,10 +30,12 @@ const Post = ({navigation, route}) => {
             content : postContent,
             preferredLocation: postLocation,
             expectedDuration: `${postDuration}${durationUnit}`,
+            postDuration: postDuration,
+            durationUnit: durationUnit,
             roleAssignments: roleData
         }
         postBoard(postData).then(data=>{
-            if (!data.isFailed) navigation.pop();
+            if (!data.isFailed) navigation.navigate('OnGoing');
         })
     }
     return (

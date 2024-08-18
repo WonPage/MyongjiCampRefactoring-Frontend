@@ -6,6 +6,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 
 import Loading from '../(other)/Loading';
+import { Ionicons } from '@expo/vector-icons';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -78,7 +79,8 @@ const Notification = ({navigation}) => {
               )}}>
               <View style={{ borderRadius: 10, height:hp('10%'),width:hp('40%'), marginTop:hp('2%'), elevation:1,
                     backgroundColor:item.read?'lightgray':'white', padding:hp('1.5%'), justifyContent:'space-between'}}>
-                      <View>
+                      <View style={{flexDirection:'row', alignItems:'center'}}>
+                      <Ionicons name="chatbox-outline" size={18} color="black" style={{marginRight:5, paddingTop:5}} />
                       <Text style={{fontSize:15}}>{item.content}</Text>
                       </View>
                       <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>

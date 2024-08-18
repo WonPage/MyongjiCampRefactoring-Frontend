@@ -1,13 +1,14 @@
 /** 담당자 채윤 
- * 240809 - 게시글 삭제 확인 구현 */
+ * 240809 - 게시글 삭제 확인 구현
+ * 240817 - 개발완료 게시글 삭제 확인 구현 */
 
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useBoard from "../hook/useBoard";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 export default function BoardDeleteModal({navigation, route}){
-    const {deleteBoard} = useBoard();
-    const {boardId} = route.params;
+    const {deleteBoard, deleteCompleteBoard} = useBoard();
+    const {boardId, type} = route.params;
     return(
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0, 0, 0, 0.3)' }]} onPress={navigation.goBack} />
@@ -18,10 +19,18 @@ export default function BoardDeleteModal({navigation, route}){
                     <Text style={{ fontSize:20, marginLeft: 3, color:'#A0937D' }}>정말 게시글을 삭제하시겠습니까?</Text>
                 </View>
                 <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
-                    <TouchableOpacity onPress={()=>{
-                        deleteBoard(boardId).then(data=>{
-                            if (!data.isFailed) {navigation.replace('MainNavigation')}
-                        })}}
+                    <TouchableOpacity onPress={ type===undefined ?
+                        () => {
+                            deleteBoard(boardId).then(data=>{
+                                if (!data.isFailed) {navigation.replace('MainNavigation')}
+                            })
+                        } :
+                        () => {
+                            deleteCompleteBoard(boardId).then(data=>{
+                                if (!data.isFailed) {navigation.replace('MainNavigation')}
+                            })
+                        }
+                    }
                     style={{backgroundColor:'#BACD92', width:wp('16%'), height:hp('5%'), justifyContent:'center', alignItems:'center', paddingBottom:hp('0.5%'), borderRadius:30}}>
                         <Text style={{ color: 'white', fontWeight:'500' }}>확인</Text>
                     </TouchableOpacity>
