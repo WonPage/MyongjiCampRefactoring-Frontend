@@ -22,8 +22,10 @@ const useNotification = () => {
       })
     return result;
   }
-  async function notificationRead(notificationId, boardId) {
+  async function notificationRead(notificationId, boardId, notificationStatus) {
+    console.log("hi")
     const token = JSON.parse(await AsyncStorage.getItem('token'));
+    console.log(token)
     const result = axios.post(`${API_URL}/read/notification/${notificationId}`, {}, {
       headers: { Authorization: `Bearer ${token.token}` }
     })
@@ -33,7 +35,12 @@ const useNotification = () => {
       .catch(error => {
         console.log(error);
       })
-      navigation.navigate('PostDetail', {boardId:boardId, title:'게시글'})
+      if(notificationStatus == 'APPLY'){
+        navigation.navigate('Apply')
+      }
+      else{
+        navigation.navigate('PostDetail', {boardId:boardId, title:'게시글'})
+      }
 
     return result;
 
@@ -42,26 +49,3 @@ const useNotification = () => {
   return { getNotifications, notificationRead }
 }
 export default useNotification;
-
-
-
-/*     async function sendPushNotification(expoPushToken) {
-        const message = {
-          to: expoPushToken,
-          sound: 'default',
-          title: 'Original Title',
-          body: 'And here is the body!',
-          data: {} //여기로 다른 페이지 이동 가능할지도
-        };
-        const res = await fetch('https://exp.host/--/api/v2/push/send', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(message),
-        });
-        const result = await res.json();
-        console.log(result); 
-      } */

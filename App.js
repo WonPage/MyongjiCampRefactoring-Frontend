@@ -6,7 +6,7 @@ import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import NetworkErrorModal from './modal/NetworkErrorModal';
 import MainNavigation from './navigation/Navigation';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -98,8 +98,8 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      await setupNotificationHandler();
-
+ /*     await setupNotificationHandler();
+ 
       const permissionGranted = await requestUserPermission();
       if (permissionGranted) {
         const token = await messaging().getToken();
@@ -133,7 +133,7 @@ export default function App() {
           },
           trigger: null,
         });
-      });
+      }); */
 
       const unsubscribeNetwork = NetInfo.addEventListener(state => {
         setIsConnected(state.isConnected);
