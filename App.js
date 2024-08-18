@@ -1,3 +1,4 @@
+import * as NetInfo from '@react-native-community/netinfo';
 import { StatusBar } from 'expo-status-bar';
 import { Alert, StyleSheet, Text, TouchableOpacity, View, Platform  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -155,7 +156,13 @@ export default function App() {
         });
       });
 
-      return () => unsubscribe();
+      const unsubscribeNetwork = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected);
+      })
+      return () => {
+        unsubscribe();
+        unsubscribeNetwork();
+      };
     })();
   }, [])
 
