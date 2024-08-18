@@ -33,28 +33,7 @@ export default function App() {
     });
   };
 
-  async function sendPushToken(expoToken) {
-    const token = JSON.parse(await AsyncStorage.getItem('token'))
-     if (token !== null) {
-       try {
-         const res = await fetch(`${API_URL}/send/expoToken`, {
-           method: 'POST',
-           headers: {
-             Authorization: `Bearer ${token.token}`,
-             'Content-Type': 'application/json',
-           },
-           body: JSON.stringify({ token: expoToken }),
-         })
-         const result = await res.json()
-        //  console.log('result',result)
-       } catch (error) {
-         console.error('Error sending push token:', error)
-       }
-       AsyncStorage.setItem('expoToken', JSON.stringify(expoToken))
-    } 
-  }
-
-  async function deleteExpoToken(){
+/*   async function deleteExpoToken(){
     //ASYNCSTORAGE에 삭제 & DB도 삭제
     const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'))
     const token = JSON.parse(await AsyncStorage.getItem('token'))
@@ -82,7 +61,7 @@ export default function App() {
       })
     const result = await res.json()
     console.log('delete',result)
-  }
+  } */
 
 /*   async function checkNotificationPermisssion() {
     if (Device.isDevice) {
