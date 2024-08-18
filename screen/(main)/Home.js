@@ -6,6 +6,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Loading from "../(other)/Loading";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+
 const BACKGROUND_COLOR = '#495579';
 
 

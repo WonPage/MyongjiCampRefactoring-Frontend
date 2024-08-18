@@ -1,50 +1,36 @@
-import NetInfo from '@react-native-community/netinfo';
 import { StatusBar } from 'expo-status-bar';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, Platform  } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
 import NetworkErrorModal from './modal/NetworkErrorModal';
 import MainNavigation from './navigation/Navigation';
-// import messaging from '@react-native-firebase/messaging'
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
+import messaging from '@react-native-firebase/messaging';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function App() {
-  // expo Notification 권한 허용
-  async function registerForPushNotificationsAsync() {
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
+  const requestUserPermission = async () => {
+    const settings = await Notifications.requestPermissionsAsync();
+    const enabled = settings.granted || settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Authorization status:', settings);
     }
 
-    if (Device.isDevice) {
-      const projectId =
-        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-      if (!projectId) {
-        handleRegistrationError('Project ID not found');
-      }
-      try {
-        const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId,
-          })
-        ).data;
-        return pushTokenString;
-      } catch (e) {
-        handleRegistrationError(`${e}`);
-      }
-    } else {
-      handleRegistrationError('Must use physical device for push notifications');
-    }
-  }
+    return enabled;
+  };
+
+  const setupNotificationHandler = async () => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
+  };
 
   async function sendPushToken(expoToken) {
     const token = JSON.parse(await AsyncStorage.getItem('token'))
@@ -97,7 +83,7 @@ export default function App() {
     console.log('delete',result)
   }
 
-  async function checkNotificationPermisssion() {
+/*   async function checkNotificationPermisssion() {
     if (Device.isDevice) {
       const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'))
       if ((await Notifications.getPermissionsAsync()).status === 'granted') { 
@@ -125,22 +111,52 @@ export default function App() {
         }
       }
     }
-
-
-  }
+  } */
   /** 네트워크 처리 로직 */
   const [isConnected, setIsConnected] = useState(true);
 
 
   useEffect(() => {
-    // check 잘 되는지 확인 필요 -> 채윤이 폰으로?
-    checkNotificationPermisssion()
-    const unsubscribe = NetInfo.addEventListener(state => {
-      setIsConnected(state.isConnected);
-    })
-    return () => {
-      unsubscribe();
-    }
+    (async () => {
+      await setupNotificationHandler();
+
+      const permissionGranted = await requestUserPermission();
+      if (permissionGranted) {
+        const token = await messaging().getToken();
+        await AsyncStorage.setItem('expoToken', JSON.stringify(token));
+        console.log(token);
+      } else {
+        //여기여기
+        //grant가 아닌데 토큰이 있으면 여기서 기기 내 저장된 fcm 삭제 및 서버에 redis에서 삭제 요청?
+        console.log('Permission not granted');
+      }
+
+      const initialNotification = await messaging().getInitialNotification();
+      if (initialNotification) {
+        console.log('Notification caused app to open from quit state:', initialNotification.notification);
+      }
+
+      messaging().onNotificationOpenedApp(remoteMessage => {
+        console.log('Notification caused app to open from background state:', remoteMessage.notification);
+      });
+
+      messaging().setBackgroundMessageHandler(async remoteMessage => {
+        console.log('Message handled in the background!', remoteMessage);
+      });
+
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: remoteMessage.notification?.title,
+            body: remoteMessage.notification?.body,
+            data: remoteMessage.data,
+          },
+          trigger: null,
+        });
+      });
+
+      return () => unsubscribe();
+    })();
   }, [])
 
 

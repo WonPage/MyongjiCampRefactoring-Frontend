@@ -1,35 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Platform, TouchableOpacity } from 'react-native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import useNotification from '../../hook/useNotification';
 import { ScrollView } from 'react-native-gesture-handler';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
+
 import Loading from '../(other)/Loading';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
- 
-/*     useEffect(()=>{
-        getFcmToken()
-        const subscribe = messaging().onMessage(async remoteMessage => {
-            Alert.alert('remote message ',JSON.stringify(remoteMessage))
-        })
-        // subscribe()
-        return ()=>{
-            subscribe()
-        }
-    },[]) 
-
-
-     const getFcmToken = async ()=> {
-        const token = await messaging().getToken();
-        Alert.alert('FCM TOKEN', token)
-    } */
-
-
-
-
 
 const Notification = ({navigation}) => {
   const {getNotifications, notificationRead} = useNotification();

@@ -52,6 +52,7 @@ export default function useComment(){
             return {isFailed:true};
         }
         const token = JSON.parse(await AsyncStorage.getItem('token'));
+        console.log(token)
         const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'))
         const data = axios.post(`${API_URL}/api/auth/recruit/${boardId}/comment`, {
             content: comment,
