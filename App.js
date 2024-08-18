@@ -1,4 +1,4 @@
-import * as NetInfo from '@react-native-community/netinfo';
+import NetInfo from '@react-native-community/netinfo';
 import { StatusBar } from 'expo-status-bar';
 import { Alert, StyleSheet, Text, TouchableOpacity, View, Platform  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
