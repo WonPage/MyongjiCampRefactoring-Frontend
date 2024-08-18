@@ -51,12 +51,12 @@ const useUsers = () => {
                 refreshExp: refreshExp.toISOString()
             }
             await AsyncStorage.setItem('token', JSON.stringify(loginData));
-            console.log(token.token)
+            // console.log(token.token)
             const expoToken = JSON.parse(await AsyncStorage.getItem('expoToken'))
             if (expoToken !== null) {
                 sendPushToken(expoToken)
             }
-            console.log(loginData.token)
+            // console.log(loginData.token)
 
             navigation.replace('MainNavigation');
 
