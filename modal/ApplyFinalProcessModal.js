@@ -32,14 +32,14 @@ export default function ApplyFinalProcessModal({navigation, route}){
                         <View style={{marginTop:hp('2%')}}>
                             <Text>상대 메세지</Text>
                             <View style={{borderWidth:1, borderRadius:8, justifyContent:'center', padding:16, marginTop:7}}>
-                                <Text>{data.applyContent?data.applyContent:"메세지가 없습니다."}</Text>
+                                <Text>{data.resultContent?data.resultContent:"메세지가 없습니다."}</Text>
                             </View>
                         </View>
                         {type==='ACCEPTED' && data.finalStatus!=='REJECTED' &&
                         <View style={{marginTop:hp('2%')}}>
                             <Text>URL 링크</Text>
                             <View style={{borderWidth:1, borderRadius:8, justifyContent:'center', padding:16, marginTop:7}}>
-                                <Text>{data.finalStatus==="ACCEPTED" ? (data.applyUrl?data.applyUrl:"URL이 없습니다.") : "URL는 수락 후 공개됩니다."}</Text>
+                                <Text>{data.finalStatus==="ACCEPTED" ? (data.resultUrl?data.resultUrl:"URL이 없습니다.") : "URL는 수락 후 공개됩니다."}</Text>
                             </View>
                         </View>}
                     </View>

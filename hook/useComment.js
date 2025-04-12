@@ -12,7 +12,7 @@ export default function useComment(){
 
     const getComment = async(boardId) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.get(`${API_URL}/api/auth/recruit/${boardId}/comment`, {
+        const data = axios.get(`${API_URL}/api/recruit/${boardId}/comment`, {
             headers: { Authorization: `Bearer ${token.token}` },
         }).then(res=>{
             if (res.status===200){
@@ -27,7 +27,7 @@ export default function useComment(){
     };
     const deleteComment = async(boardId, commentId) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.delete(`${API_URL}/api/auth/recruit/${boardId}/comment/${commentId}`, {
+        const data = axios.delete(`${API_URL}/api/recruit/${boardId}/comment/${commentId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -62,7 +62,7 @@ export default function useComment(){
         //     expoToken:expoToken
         // }
         // console.log(aaa);
-        const data = axios.post(`${API_URL}/api/auth/recruit/${boardId}/comment`, {
+        const data = axios.post(`${API_URL}/api/recruit/${boardId}/comment`, {
             content: comment,
             cdepth: cdepth,
             isSecret: (isSecret ? 1 : 0),

@@ -14,7 +14,7 @@ const Apply = ({navigation, route}) => {
     useFocusEffect(()=>{
         sessionCheck(route);
     })
-    const {getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, getMyCompleteBoardList} = useApply();
+    const {getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, getMyCompleteBoardList, getResumeResult} = useApply();
     const [appliedResume, setAppliedResume] = useState([]);
     const [receivedResume, setReceivedResume] = useState([]);
     const [completeList, setCompleteList] = useState([]);
@@ -42,7 +42,7 @@ const Apply = ({navigation, route}) => {
         })
     }
     const handleShowMessage = (resumeId) => {
-        getResumeDetail(resumeId)
+        getResumeResult(resumeId)
         .then(res =>{
             navigation.navigate('ApplyFinalProcessModal', {data: res.data});
         })

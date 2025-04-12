@@ -336,8 +336,10 @@ function Comment({navigation, commentList, iconPath, userId, writerId, boardId, 
 function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, setReplyId, replyNickname, setReplyNickname, boxRef, refreshComment}){
     const [comment, setComment] = useState('');
     const [isSecret, setIsSecret] = useState(false);
+    const [buttonDisable, setButtonDisable] = useState(false);
     const {writeComment} = useComment();
     const handleCommentSubmit = () => {
+        setButtonDisable(true);
         writeComment(boardId, comment, (replyMode===true?1:0), isSecret, (replyId?replyId:undefined))
         .then(response=>{
             if (!response.isFailed) {
@@ -350,6 +352,7 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
         })
         .finally(()=>{
             scrollViewRef.current.scrollToEnd({ animated: true });
+            setButtonDisable(true);
         })
     }
     useEffect(()=>{
@@ -376,7 +379,7 @@ function CommentPush({boardId, scrollViewRef, replyMode, replyId, setReplyMode, 
                 <Text onPress={()=>setIsSecret(!isSecret)} style={{color:'gray' ,textAlignVertical:'center', marginLeft:wp('-4%'), marginRight:wp('2%'), fontSize:12}}>비밀</Text>
                 <TextInput style={{ paddingHorizontal: wp('3%'), width:wp(56), fontSize: 16, backgroundColor: 'lightgray', borderRadius: wp('3%'), marginRight: wp('4%') }}
                     value={comment} onChangeText={setComment} ref={boxRef} placeholder={replyMode ? `@${replyNickname}` : undefined} />
-                <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit}
+                <TouchableOpacity activeOpacity={0.8} onPress={handleCommentSubmit} disabled={buttonDisable}
                     style={{ width: wp('13%'),backgroundColor: '#002E66', alignItems: 'center', justifyContent: 'center', borderRadius: wp('2%')}}>
                     <Text style={{ color: 'white' }}>작성</Text>
                 </TouchableOpacity>

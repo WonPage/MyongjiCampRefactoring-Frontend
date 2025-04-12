@@ -49,6 +49,20 @@ export default function useApply() {
             })
         return result;
     }
+
+    async function getResumeResult(resumeId) { //240820
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        const result = axios.get(`${API_URL}/api/auth/apply/result/${resumeId}`, {
+            headers: {
+                Authorization: `Bearer ${token.token}`
+            },
+        })
+            .then(res => {
+                return res.data;
+            })
+        return result;
+    }
+
     async function getReceivedResumeList(boardId) {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
         const result = axios.get(`${API_URL}/api/auth/apply/list/${boardId}`, {
@@ -144,7 +158,7 @@ export default function useApply() {
             expectedDuration: boardData.expectedDuration,
             roleAssignments: boardData.roleAssignments
         }
-        const data = axios.put(`${API_URL}/api/auth/recruit/${boardId}`, putData, {
+        const data = axios.put(`${API_URL}/api/recruit/${boardId}`, putData, {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -204,6 +218,6 @@ export default function useApply() {
     }
 
     return { getAppliedResume, getReceivedResume, getResumeDetail, getReceivedResumeList, resumeProcess, cancleApply, completeRecruit,
-        sendApply, resumeFinalProcess, getMyCompleteBoardList
+        sendApply, resumeFinalProcess, getMyCompleteBoardList, getResumeResult
      }
 }

@@ -75,7 +75,7 @@ export default function useBoard(){
     /** 게시글 상세보기 */
     const getBoardDetail = async(boardId) => {
     const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.get(`${API_URL}/api/auth/recruit/${boardId}`, {
+        const data = axios.get(`${API_URL}/api/recruit/${boardId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -113,7 +113,7 @@ export default function useBoard(){
     /** 게시글 삭제하기  */
     const deleteBoard = async(boardId) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.delete(`${API_URL}/api/auth/recruit/${boardId}`, {
+        const data = axios.delete(`${API_URL}/api/recruit/${boardId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -156,7 +156,7 @@ export default function useBoard(){
     /** 게시글 수정하기 */
     const updateBoard = async(updateData) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.put(`${API_URL}/api/auth/recruit/${updateData.boardId}`, {
+        const data = axios.put(`${API_URL}/api/recruit/${updateData.boardId}`, {
             title:updateData.title,
             content:updateData.content,
             status :updateData.status,
@@ -227,7 +227,7 @@ export default function useBoard(){
                 name: image.fileName
             })
         })
-        const data = axios.post(`${API_URL}/api/auth/complete/${recruitId}`, formData, {
+        const data = axios.post(`${API_URL}/api/complete/${recruitId}`, formData, {
             headers : {
                 'Content-Type':'multipart/form-data',
                 Authorization: `Bearer ${token.token}`,
@@ -254,7 +254,7 @@ export default function useBoard(){
     /** 개발 완료 게시글 상세보기 */
     const getCompleteBoardDetail = async(boardId) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.get(`${API_URL}/api/auth/complete/${boardId}`, {
+        const data = axios.get(`${API_URL}/api/complete/${boardId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -274,7 +274,7 @@ export default function useBoard(){
     /** 개발 완료 게시글 삭제하기 */
     const deleteCompleteBoard = async(boardId) => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = axios.delete(`${API_URL}/api/auth/complete/${boardId}`, {
+        const data = axios.delete(`${API_URL}/api/complete/${boardId}`, {
             headers: {Authorization: `Bearer ${token.token}` }
         })
         .then(res => {
@@ -314,7 +314,7 @@ export default function useBoard(){
                 name: image.fileName
             })
         })
-        const data = axios.put(`${API_URL}/api/auth/complete/${updateData.boardId}`, formData, {
+        const data = axios.put(`${API_URL}/api/complete/${updateData.boardId}`, formData, {
             headers : {
                 'Content-Type':'multipart/form-data',
                 Authorization: `Bearer ${token.token}`,
